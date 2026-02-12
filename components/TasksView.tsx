@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Plus, Search, LayoutGrid, LayoutList, Filter, Settings2, X } from 'lucide-react';
+import { Plus, Search, LayoutGrid, LayoutList, Filter, Settings2, X, Download, FileText } from 'lucide-react';
 import { TaskTable } from './TaskTable';
 import { EditTaskModal } from './EditTaskModal';
 import { BulkUpdateModal } from './BulkUpdateModal';
 import { SearchableSelect } from './SearchableSelect';
 import { Task, User, Category, Client, Firm, ActionLogEntry, TaskTemplate } from '../types'; 
-import { parseToISO } from '../App';
+import { parseToISO, formatToIndianDateTime } from '../App';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface TasksViewProps {
   title: string;
@@ -135,6 +137,65 @@ export const TasksView: React.FC<TasksViewProps> = ({
     setSearchTerm('');
   };
 
+  const exportToExcel = () => {
+    const headers = ["S.No.", "Created At", "Created By", "Task", "Assignee", "Status", "Last Updated", "Remarks"];
+    const csvRows = [headers.join(",")];
+    
+    filteredTasks.forEach((task, index) => {
+      const row = [
+        index + 1,
+        `"${task.date}"`,
+        `"${task.createdBy}"`,
+        `"${task.title.replace(/"/g, '""')}"`,
+        `"${task.assignee}"`,
+        `"${task.status}"`,
+        `"${task.lastUpdateDate}"`,
+        `"${(task.lastUpdateRemarks || "").replace(/"/g, '""')}"`
+      ];
+      csvRows.push(row.join(","));
+    });
+
+    const csvString = csvRows.join("\n");
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Tasks_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF('l', 'mm', 'a4');
+    doc.setFontSize(16);
+    doc.text(title, 14, 15);
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 22);
+
+    const tableHeaders = [["S.No", "Created", "Created By", "Task", "Assignee", "Status", "Last Update", "Remarks"]];
+    const tableData = filteredTasks.map((t, i) => [
+      i + 1,
+      t.date,
+      t.createdBy,
+      t.title,
+      t.assignee,
+      t.status,
+      t.lastUpdateDate,
+      t.lastUpdateRemarks || "-"
+    ]);
+
+    autoTable(doc, {
+      head: tableHeaders,
+      body: tableData,
+      startY: 28,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [67, 56, 202] }
+    });
+
+    doc.save(`Tasks_${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
   const hasActiveFilters = filterStatus !== 'All Status' || filterAssignee !== 'All Leaders' || dateFrom || dateTo || lastUpdateFrom || lastUpdateTo || searchTerm;
 
   return (
@@ -144,7 +205,27 @@ export const TasksView: React.FC<TasksViewProps> = ({
             <h2 className="text-2xl font-bold text-indigo-600">{title}</h2>
             <p className="text-sm text-black mt-1">{description}</p>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap justify-end">
+          {/* Download options requested in screenshot 3 */}
+          <div className="flex gap-2 mr-2">
+            <button 
+              onClick={exportToExcel}
+              className="flex items-center space-x-1 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-xs font-bold shadow-sm transition-colors uppercase tracking-wider"
+              title="Download Excel (CSV)"
+            >
+              <FileText size={14} />
+              <span className="hidden sm:inline">Excel</span>
+            </button>
+            <button 
+              onClick={exportToPDF}
+              className="flex items-center space-x-1 px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-xs font-bold shadow-sm transition-colors uppercase tracking-wider"
+              title="Download PDF"
+            >
+              <Download size={14} />
+              <span className="hidden sm:inline">PDF</span>
+            </button>
+          </div>
+
           {selectedIds.length > 0 && (
             <button 
               onClick={() => setIsBulkUpdateModalOpen(true)}
@@ -223,7 +304,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
         onSort={(key, dir) => { setSortKey(key); setSortDir(dir); }}
         startIndex={(currentPage - 1) * itemsPerPage + 1}
         showSelection={true}
-        hideCreationInfo={hideCreationInfo}
+        hideCreationInfo={false}
       />
       
       {totalPages > 1 && (

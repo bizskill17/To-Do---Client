@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
@@ -404,7 +403,19 @@ export default function App() {
   };
 
   const isAdmin = currentUser?.role === 'Admin';
-  const visibleTasks = useMemo(() => tasks, [tasks]);
+  
+  // Implemented visibility logic: Admin sees all, Employees see rows where they are Assignee or Creator
+  const visibleTasks = useMemo(() => {
+    if (!currentUser) return [];
+    if (isAdmin) return tasks;
+    
+    const userName = currentUser.name.toLowerCase().trim();
+    return tasks.filter(t => {
+      const matchesAssignee = t.assignee && t.assignee.toLowerCase().trim() === userName;
+      const matchesCreator = t.createdBy && t.createdBy.toLowerCase().trim() === userName;
+      return matchesAssignee || matchesCreator;
+    });
+  }, [tasks, isAdmin, currentUser]);
 
   const handleDashboardFilter = (type: string, value: string) => {
     if (type === 'assignee-pending') {
@@ -431,7 +442,6 @@ export default function App() {
     users, categories, clients, firms, syncingIds, currentUser, taskTemplates,
     filterStatus, setFilterStatus, filterPriority, setFilterPriority, 
     filterClient, setFilterClient, filterOwner, setFilterOwner, filterAssignee, setFilterAssignee, 
-    // Fixed duplicate shorthand property errors by providing correct setter functions
     dateFrom, setDateFrom, dateTo, setDateTo, lastUpdateFrom, setLastUpdateFrom, lastUpdateTo, setLastUpdateTo, searchTerm, setSearchTerm,
     onOpenUpdateModal: (task: Task) => { setSelectedTaskForUpdate(task); setIsUpdateTaskModalOpen(true); },
     onEditTask: (task: Task) => { setSelectedTaskForEdit(task); setIsEditTaskModalOpen(true); }, 
@@ -461,14 +471,23 @@ export default function App() {
     { id: 'users', label: 'Users', icon: <Users size={20} />, section: 'Master' },
   ], []);
 
+  // Filtered nav items based on Admin status: hide Kanban and Users for Employees
+  const filteredNavItems = useMemo(() => {
+    return navItems.filter(item => {
+      if (item.id === 'kanban') return isAdmin;
+      if (item.id === 'users') return isAdmin;
+      return true;
+    });
+  }, [navItems, isAdmin]);
+
   if (!currentUser || !apiUrl) return <LoginView onLogin={handleLogin} isAuthenticating={isLoading} savedWorkspaceId={workspaceId} />;
 
   return (
     <div className={`flex h-screen bg-gray-50 overflow-hidden flex-col ${layoutMode === 'side' ? 'md:flex-row' : 'md:flex-col'}`}>
       {layoutMode === 'side' ? (
-        <Sidebar items={navItems} activeTab={activeTab} onTabChange={setActiveTab} onLayoutChange={setLayoutMode} layoutMode={layoutMode} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} lastSynced={lastSynced} isSyncing={isSyncing} onSync={() => fetchData()} onLogout={() => { setCurrentUser(null); localStorage.removeItem('taskpro_user'); }} onExitWorkspace={() => { setCurrentUser(null); localStorage.clear(); }} workspaceId={workspaceId} />
+        <Sidebar items={filteredNavItems} activeTab={activeTab} onTabChange={setActiveTab} onLayoutChange={setLayoutMode} layoutMode={layoutMode} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} lastSynced={lastSynced} isSyncing={isSyncing} onSync={() => fetchData()} onLogout={() => { setCurrentUser(null); localStorage.removeItem('taskpro_user'); }} onExitWorkspace={() => { setCurrentUser(null); localStorage.clear(); }} workspaceId={workspaceId} />
       ) : (
-        <TopBar items={navItems} activeTab={activeTab} onTabChange={setActiveTab} onLayoutChange={setLayoutMode} layoutMode={layoutMode} lastSynced={lastSynced} isSyncing={isSyncing} onSync={() => fetchData()} />
+        <TopBar items={filteredNavItems} activeTab={activeTab} onTabChange={setActiveTab} onLayoutChange={setLayoutMode} layoutMode={layoutMode} lastSynced={lastSynced} isSyncing={isSyncing} onSync={() => fetchData()} />
       )}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         {layoutMode === 'side' && (
@@ -514,7 +533,10 @@ export default function App() {
         </main>
       </div>
       <AddTaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} onSave={handleAddTaskOptimistic} users={users} categories={categories} clients={clients} firms={firms} taskTemplates={taskTemplates} onAddCategory={() => setIsCategoryModalOpen(true)} onAddClient={() => setIsAddClientModalOpen(true)} onAddFirm={() => setIsFirmModalOpen(true)} />
-      {/* Fix: Corrected isEditModalOpen to isEditTaskModalOpen and setIsEditModalOpen to setIsEditTaskModalOpen */}
+      {/* 
+        Comment: Fixed incorrect variable name 'isEditModalOpen' to 'isEditTaskModalOpen' 
+        and 'setIsEditModalOpen' to 'setIsEditTaskModalOpen' to match definitions.
+      */}
       <EditTaskModal isOpen={isEditTaskModalOpen} onClose={() => setIsEditTaskModalOpen(false)} task={selectedTaskForEdit} onSave={handleEditTaskOptimistic} onAddCategory={() => setIsCategoryModalOpen(true)} onAddClient={() => setIsAddClientModalOpen(true)} onAddFirm={() => setIsFirmModalOpen(true)} users={users} categories={categories} clients={clients} firms={firms} taskTemplates={taskTemplates} />
       <UpdateTaskModal 
         isOpen={isUpdateTaskModalOpen} 

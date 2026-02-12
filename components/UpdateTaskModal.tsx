@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { X, AlertTriangle, Clock, DollarSign, UserRoundMinus } from 'lucide-react'; 
 import { Task, User, Client, ActionLogEntry, Firm } from '../types'; 
@@ -114,11 +113,21 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
   };
 
   const handleFinalSubmit = () => {
+    // Generate timestamp for immediate UI feedback (DD/MM/YYYY HH:mm)
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const timestamp = `${day}/${month}/${year} ${hours}:${minutes}`;
+
     const updatedTask: Task = { 
         ...task, 
         status: formData.status as any,
         lastUpdateRemarks: remarksInput, 
-        hoursTaken: task.hoursTaken || 0, // No longer collecting hours from UI, preserve existing
+        lastUpdateDate: timestamp, // Crucial for immediate local feedback (Screenshot 4)
+        hoursTaken: task.hoursTaken || 0,
         billingRate: parseFloat(billingRateInput) || 0, 
         firmToBill: firmToBillInput,
     };

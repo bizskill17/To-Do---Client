@@ -130,12 +130,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
       )}
 
       <div className="bg-blue-50/70 p-6 rounded-2xl border-2 border-blue-300 shadow-sm">
-        <SectionHeader title="Pending Tasks Summary" icon={<Clock size={20}/>} />
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard title="Pending Tasks" value={stats.totalTasks} icon={<CheckSquare size={20}/>} iconBgColor="bg-blue-100" iconColor="text-blue-600" />
+        <SectionHeader title="PENDING TASKS SUMMARY" icon={<Clock size={20}/>} />
+        <div className={`grid grid-cols-2 sm:grid-cols-2 ${isAdmin ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
+            {/* Added onClick to satisfy the requirement that all cards are clickable */}
+            <StatCard title="Pending Tasks" value={stats.totalTasks} icon={<CheckSquare size={20}/>} iconBgColor="bg-blue-100" iconColor="text-blue-600" onClick={() => onNavigate('all-tasks')} />
             <StatCard title="Pending" value={stats.pendingTasks} icon={<Clock size={20}/>} iconBgColor="bg-amber-100" iconColor="text-amber-600" onClick={() => onNavigate('pending')} />
             <StatCard title="Completed" value={stats.completedTasksCount} icon={<CheckCircle size={20}/>} iconBgColor="bg-green-100" iconColor="text-green-600" onClick={() => onNavigate('completed')} />
-            <StatCard title="Total Users" value={stats.totalUsers} icon={<Users size={20}/>} iconBgColor="bg-indigo-100" iconColor="text-indigo-600" onClick={isAdmin ? () => onNavigate('users') : undefined} />
+            {/* Total Users only visible if isAdmin as requested */}
+            {isAdmin && (
+              <StatCard title="Total Users" value={stats.totalUsers} icon={<Users size={20}/>} iconBgColor="bg-indigo-100" iconColor="text-indigo-600" onClick={() => onNavigate('users')} />
+            )}
         </div>
       </div>
 
