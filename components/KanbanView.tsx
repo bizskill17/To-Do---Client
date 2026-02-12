@@ -19,7 +19,6 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
   const todayStr = new Date().toLocaleDateString('en-GB');
   
   const filteredTasks = tasks.filter(t => {
-    // Fix: Removed 'Complete' comparison to match Task.status type definition in types.ts
     if (t.status === 'Completed') {
       if (t.lastUpdateDate) {
         // Assuming format is DD/MM/YYYY HH:mm
@@ -116,7 +115,6 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
     const now = new Date();
     const timestamp = now.toLocaleString('en-GB').replace(',', '');
     
-    // Fix: Removed 'Complete' comparison to avoid unintentional narrowing issues and match types.ts
     const isCurrentlyCompleted = task.status === 'Completed';
     onUpdateTask({
       ...task,
@@ -127,7 +125,6 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
   };
 
   const getTaskBgColor = (status: string) => {
-    // Fix: Normalized status check to 'Completed' to match Task model
     if (status === 'Completed') {
       return 'bg-green-50';
     }
@@ -165,7 +162,6 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
                     <div className="w-8 bg-indigo-600 flex items-center justify-center shrink-0 border-r border-indigo-700">
                       <button 
                         onClick={(e) => handleToggleComplete(e, task)}
-                        // Fix: Using correct 'Completed' status for conditional styling
                         className={`transition-all duration-200 transform active:scale-95 ${task.status === 'Completed' ? 'text-green-400' : 'text-indigo-200 hover:text-white'}`}
                         title={task.status === 'Completed' ? "Click to Revert to Pending" : "Click to Mark as Completed"}
                       >
@@ -182,7 +178,6 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
                     
                     {/* Content Area */}
                     <div className="flex-1 p-2 flex flex-col justify-center" onClick={() => onOpenUpdateModal(task)}>
-                      {/* Fix: Using correct 'Completed' status for strikethrough logic */}
                       <h4 className={`text-[11px] font-bold text-gray-900 leading-tight ${task.status === 'Completed' ? 'line-through opacity-40' : ''}`}>
                         {task.title}
                         {task.lastUpdateRemarks && (

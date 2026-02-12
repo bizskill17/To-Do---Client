@@ -167,7 +167,7 @@ export const RecurringTasksView: React.FC<RecurringTasksViewProps> = ({
     checkDate.setHours(0, 0, 0, 0);
 
     if (today >= checkDate) {
-        if (dbStatus === 'Complete') return 'Not Yet Started';
+        if (dbStatus === 'Complete' || dbStatus === 'Completed') return 'Not Yet Started';
         return dbStatus;
     }
     return dbStatus;
@@ -202,7 +202,7 @@ export const RecurringTasksView: React.FC<RecurringTasksViewProps> = ({
         checkDate.setHours(0, 0, 0, 0);
         
         if (today < checkDate) return false;
-        if (effectiveStatus === 'Complete') return false; 
+        if (effectiveStatus === 'Complete' || effectiveStatus === 'Completed') return false; 
       }
 
       if (searchTerm) {
@@ -284,19 +284,15 @@ export const RecurringTasksView: React.FC<RecurringTasksViewProps> = ({
   };
 
   const getStatusColor = (status?: string) => {
-    switch (status) {
-      case 'Complete': return 'bg-green-100 text-green-700';
-      case 'In Progress': return 'bg-orange-100 text-orange-700';
-      default: return 'bg-gray-100 text-gray-700';
-    }
+    if (status === 'Complete' || status === 'Completed') return 'bg-green-100 text-green-700 border border-green-200';
+    if (status === 'Not Yet Started' || !status) return 'bg-gray-100 text-gray-700 border border-gray-200';
+    return 'bg-orange-100 text-orange-700 border border-orange-200';
   };
 
   const getRowBgColor = (status?: string) => {
-    switch (status) {
-      case 'Complete': return 'bg-green-50';
-      case 'In Progress': return 'bg-orange-50';
-      default: return 'bg-white';
-    }
+    if (status === 'Complete' || status === 'Completed') return 'bg-green-50';
+    if (status === 'Not Yet Started' || !status) return 'bg-white';
+    return 'bg-orange-50';
   };
 
   const thClass = "px-4 py-3 text-[10px] font-bold text-white uppercase tracking-wider border-r border-indigo-500 last:border-r-0 cursor-pointer hover:bg-indigo-700 transition-colors select-none";
@@ -388,7 +384,7 @@ export const RecurringTasksView: React.FC<RecurringTasksViewProps> = ({
                 const effectiveStatus = getEffectiveStatus(task);
                 const nextDueStr = getNextDueDateStr(task);
                 const nextDueObj = getNextDueDateObject(task);
-                const isOverdue = effectiveStatus !== 'Complete' && nextDueObj && (nextDueObj.getTime() < new Date().setHours(0,0,0,0));
+                const isOverdue = (effectiveStatus !== 'Complete' && effectiveStatus !== 'Completed') && nextDueObj && (nextDueObj.getTime() < new Date().setHours(0,0,0,0));
                 
                 return (
                   <tr key={task.id} className={`${getRowBgColor(effectiveStatus)} hover:brightness-95 transition-colors ${selectedIds.includes(task.id) ? 'ring-2 ring-indigo-500 ring-inset' : ''}`}>
@@ -408,7 +404,7 @@ export const RecurringTasksView: React.FC<RecurringTasksViewProps> = ({
                     <td className={tdClass}>{task.category}</td>
                     <td className={tdClass}>{task.assignee}</td>
                     <td className={tdClass}>
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getStatusColor(effectiveStatus)}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase shadow-sm ${getStatusColor(effectiveStatus)}`}>
                             {effectiveStatus}
                         </span>
                     </td>
@@ -445,7 +441,7 @@ export const RecurringTasksView: React.FC<RecurringTasksViewProps> = ({
              const effectiveStatus = getEffectiveStatus(task);
              const nextDueStr = getNextDueDateStr(task);
              const nextDueObj = getNextDueDateObject(task);
-             const isOverdue = effectiveStatus !== 'Complete' && nextDueObj && (nextDueObj.getTime() < new Date().setHours(0,0,0,0));
+             const isOverdue = (effectiveStatus !== 'Complete' && effectiveStatus !== 'Completed') && nextDueObj && (nextDueObj.getTime() < new Date().setHours(0,0,0,0));
 
              return (
                 <div key={task.id} className={`${getRowBgColor(effectiveStatus)} rounded-lg shadow-sm border p-4 relative ${selectedIds.includes(task.id) ? 'border-indigo-500 ring-2 ring-indigo-100' : 'border-gray-200'}`}>
@@ -462,7 +458,7 @@ export const RecurringTasksView: React.FC<RecurringTasksViewProps> = ({
                             )}
                             <span className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[10px] font-bold">#{startEntry + idx}</span>
                         </div>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getStatusColor(effectiveStatus)}`}>{effectiveStatus}</span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase shadow-sm ${getStatusColor(effectiveStatus)}`}>{effectiveStatus}</span>
                     </div>
                     <h3 className="font-bold text-gray-900 leading-tight mt-2">{task.title}</h3>
                     <div className="flex items-center gap-1.5 mt-1 text-[10px] text-blue-600 font-bold uppercase">
