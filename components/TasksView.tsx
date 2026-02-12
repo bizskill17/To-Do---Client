@@ -1,0 +1,241 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { Plus, Search, LayoutGrid, LayoutList, Filter, Settings2, X } from 'lucide-react';
+import { TaskTable } from './TaskTable';
+import { EditTaskModal } from './EditTaskModal';
+import { BulkUpdateModal } from './BulkUpdateModal';
+import { SearchableSelect } from './SearchableSelect';
+import { Task, User, Category, Client, Firm, ActionLogEntry, TaskTemplate } from '../types'; 
+import { parseToISO } from '../App';
+
+interface TasksViewProps {
+  title: string;
+  description: string;
+  onAddTask: () => void;
+  tasks: Task[];
+  users: User[];
+  categories: Category[];
+  clients: Client[]; 
+  firms: Firm[]; 
+  actionLogs: ActionLogEntry[]; 
+  onOpenUpdateModal: (task: Task) => void;
+  onEditTask: (task: Task) => void;
+  onBulkUpdateTask: (ids: (string | number)[], updates: Partial<Task>) => void;
+  onDeleteTask: (id: string | number) => void;
+  onExportExcel: (tasks: Task[]) => void;
+  onViewHistory: (task: Task) => void;
+  filterType?: 'all' | 'pending' | 'completed' | 'pending-billing' | 'billed'; 
+  onAddCategory: () => void;
+  onAddClient: () => void;
+  onAddFirm: () => void; 
+  syncingIds?: Set<string | number>;
+  currentUser?: User | null;
+  taskTemplates: TaskTemplate[];
+  filterStatus: string;
+  setFilterStatus: (val: string) => void;
+  filterPriority: string;
+  setFilterPriority: (val: string) => void;
+  filterClient: string;
+  setFilterClient: (val: string) => void; 
+  filterOwner: string;
+  setFilterOwner: (val: string) => void;
+  filterAssignee: string;
+  setFilterAssignee: (val: string) => void;
+  dateFrom: string;
+  setDateFrom: (val: string) => void;
+  dateTo: string;
+  setDateTo: (val: string) => void;
+  lastUpdateFrom: string;
+  setLastUpdateFrom: (val: string) => void;
+  lastUpdateTo: string;
+  setLastUpdateTo: (val: string) => void;
+  searchTerm: string;
+  setSearchTerm: (val: string) => void;
+  hideCreationInfo?: boolean;
+}
+
+export const TasksView: React.FC<TasksViewProps> = ({ 
+  title, description, onAddTask, tasks, users, categories, clients, firms, actionLogs, onOpenUpdateModal, onEditTask, onBulkUpdateTask, onDeleteTask, onExportExcel, onViewHistory, filterType = 'all', onAddCategory, onAddClient, onAddFirm, syncingIds = new Set(), currentUser, taskTemplates, filterStatus, setFilterStatus, filterPriority, setFilterPriority, filterClient, setFilterClient, filterOwner, setFilterOwner, filterAssignee, setFilterAssignee, dateFrom, setDateFrom, dateTo, setDateTo, lastUpdateFrom, setLastUpdateFrom, lastUpdateTo, setLastUpdateTo, searchTerm, setSearchTerm, hideCreationInfo = false
+}) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isBulkUpdateModalOpen, setIsBulkUpdateModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [mobileViewMode, setMobileViewMode] = useState<'card' | 'table'>('card');
+  const [showFilters, setShowFilters] = useState(false);
+  const [sortKey, setSortKey] = useState<keyof Task>('date');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
+  useEffect(() => {
+    setSelectedIds([]);
+    setCurrentPage(1);
+  }, [filterType, filterStatus, filterPriority, filterClient, filterOwner, filterAssignee, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo, searchTerm]);
+
+  const filteredTasks = useMemo(() => {
+    return tasks.filter(task => {
+      if (filterType === 'pending' && task.status === 'Completed') return false;
+      if (filterType === 'completed' && task.status !== 'Completed') return false;
+      
+      if (searchTerm) {
+        const lowerTerm = searchTerm.toLowerCase();
+        const matchesSearch = Object.values(task).some(val => String(val || '').toLowerCase().includes(lowerTerm));
+        if (!matchesSearch) return false;
+      }
+
+      if (filterStatus !== 'All Status' && task.status !== filterStatus) return false;
+      if (filterAssignee !== 'All Leaders' && !task.assignee.includes(filterAssignee)) return false;
+
+      // Filter by Created Date
+      if (dateFrom || dateTo) {
+        const taskDateISO = parseToISO(task.date);
+        if (dateFrom && taskDateISO < dateFrom) return false;
+        if (dateTo && taskDateISO > dateTo) return false;
+      }
+
+      // Filter by Last Updated Date
+      if (lastUpdateFrom || lastUpdateTo) {
+        const updateDateISO = parseToISO(task.lastUpdateDate);
+        if (lastUpdateFrom && updateDateISO < lastUpdateFrom) return false;
+        if (lastUpdateTo && updateDateISO > lastUpdateTo) return false;
+      }
+
+      return true;
+    });
+  }, [tasks, filterType, searchTerm, filterStatus, filterAssignee, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo]);
+
+  const paginatedTasks = useMemo(() => {
+    const sorted = [...filteredTasks].sort((a, b) => {
+        const aVal = a[sortKey] || '';
+        const bVal = b[sortKey] || '';
+        return sortDir === 'asc' ? (aVal < bVal ? -1 : 1) : (aVal > bVal ? -1 : 1);
+    });
+    return sorted.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  }, [filteredTasks, sortKey, sortDir, currentPage]);
+
+  const totalPages = Math.ceil(filteredTasks.length / itemsPerPage);
+
+  const handleEditTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsEditModalOpen(true);
+  };
+
+  const handleBulkUpdate = (updates: Partial<Task>) => {
+    onBulkUpdateTask(selectedIds, updates);
+    setSelectedIds([]);
+  };
+
+  const clearAllFilters = () => {
+    setFilterStatus('All Status');
+    setFilterAssignee('All Leaders');
+    setDateFrom('');
+    setDateTo('');
+    setLastUpdateFrom('');
+    setLastUpdateTo('');
+    setSearchTerm('');
+  };
+
+  const hasActiveFilters = filterStatus !== 'All Status' || filterAssignee !== 'All Leaders' || dateFrom || dateTo || lastUpdateFrom || lastUpdateTo || searchTerm;
+
+  return (
+    <div className="space-y-6 pb-10">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h2 className="text-2xl font-bold text-indigo-600">{title}</h2>
+            <p className="text-sm text-black mt-1">{description}</p>
+        </div>
+        <div className="flex gap-2 items-center">
+          {selectedIds.length > 0 && (
+            <button 
+              onClick={() => setIsBulkUpdateModalOpen(true)}
+              className="flex items-center space-x-1 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm font-medium shadow-sm transition-colors"
+            >
+              <Settings2 size={16} />
+              <span>Bulk Action ({selectedIds.length})</span>
+            </button>
+          )}
+          <button onClick={() => onAddTask()} className="flex items-center space-x-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium shadow-sm transition-colors"><Plus size={16} /><span>Add Task</span></button>
+          <button onClick={() => setShowFilters(!showFilters)} className={`p-2 border rounded-md transition-all ${showFilters || hasActiveFilters ? 'bg-indigo-600 text-white border-indigo-700' : 'bg-white'}`}><Filter size={18} /></button>
+          <div className="flex bg-gray-100 p-1 rounded-lg">
+              <button onClick={() => setMobileViewMode('card')} className={`p-1.5 rounded-md ${mobileViewMode === 'card' ? 'bg-white shadow text-indigo-600' : 'text-gray-500'}`}><LayoutGrid size={18} /></button>
+              <button onClick={() => setMobileViewMode('table')} className={`p-1.5 rounded-md ${mobileViewMode === 'table' ? 'bg-white shadow text-indigo-600' : 'text-gray-500'}`}><LayoutList size={18} /></button>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-200">
+        <div className="flex gap-2 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+            <input type="text" placeholder="Search tasks..." className="w-full pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-100 text-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          </div>
+          {hasActiveFilters && (
+            <button 
+              onClick={clearAllFilters}
+              className="flex items-center gap-1 px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-md text-sm font-bold hover:bg-red-100 transition-colors"
+              title="Clear All Filters"
+            >
+              <X size={16} />
+              <span className="hidden md:inline">Clear</span>
+            </button>
+          )}
+        </div>
+        
+        {showFilters && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Status</label>
+              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm">
+                <option>All Status</option>
+                <option>Not Yet Started</option>
+                <option>In Progress</option>
+                <option>Completed</option>
+              </select>
+            </div>
+            <div>
+              <SearchableSelect label="Assignee" options={users.map(u => ({ value: u.name, label: u.name }))} value={filterAssignee === 'All Leaders' ? '' : filterAssignee} onChange={(v) => setFilterAssignee(v || 'All Leaders')} />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Last Updated From</label>
+              <input type="date" value={lastUpdateFrom} onChange={(e) => setLastUpdateFrom(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Last Updated To</label>
+              <input type="date" value={lastUpdateTo} onChange={(e) => setLastUpdateTo(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm" />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <TaskTable 
+        tasks={paginatedTasks} 
+        onUpdateTask={onOpenUpdateModal}
+        onEditTask={handleEditTaskClick}
+        onDeleteTask={onDeleteTask}
+        selectedIds={selectedIds}
+        onSelectionChange={setSelectedIds}
+        onViewHistory={onViewHistory}
+        viewMode={mobileViewMode}
+        syncingIds={syncingIds}
+        currentUser={currentUser}
+        sortKey={sortKey}
+        sortDir={sortDir}
+        onSort={(key, dir) => { setSortKey(key); setSortDir(dir); }}
+        startIndex={(currentPage - 1) * itemsPerPage + 1}
+        showSelection={true}
+        hideCreationInfo={hideCreationInfo}
+      />
+      
+      {totalPages > 1 && (
+        <div className="flex justify-center space-x-2 pt-4">
+          <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded disabled:opacity-50">Prev</button>
+          <span className="px-4 py-2 font-bold text-indigo-700">Page {currentPage} of {totalPages}</span>
+          <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded disabled:opacity-50">Next</button>
+        </div>
+      )}
+
+      <EditTaskModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} task={selectedTask} onSave={onEditTask} onAddCategory={onAddCategory} onAddClient={onAddClient} onAddFirm={onAddFirm} users={users} categories={categories} clients={clients} firms={firms} taskTemplates={taskTemplates} />
+      <BulkUpdateModal isOpen={isBulkUpdateModalOpen} onClose={() => setIsBulkUpdateModalOpen(false)} count={selectedIds.length} onUpdate={handleBulkUpdate} users={users} mode="status" />
+    </div>
+  );
+};
