@@ -118,7 +118,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                     )}
                     <td className={`${tdClass} font-medium`}>{task.title}</td>
                     <td className={tdClass}>{task.assignee}</td>
-                    <td className={tdClass}><span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm ${getStatusColor(task.status)}`}>{task.status}</span></td>
+                    <td className={tdClass}><span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${getStatusColor(task.status)}`}>{task.status}</span></td>
                     <td className={`${tdClass} whitespace-nowrap`}>{formatToIndianDateTime(task.lastUpdateDate)}</td>
                     <td className={tdClass}>{task.lastUpdateRemarks || '-'}</td>
                     <td className={tdClass}>
@@ -144,7 +144,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                 <input type="checkbox" className="rounded border-gray-300 text-blue-600 h-4 w-4" checked={selectedIds.includes(task.id)} onChange={() => onSelectionChange(selectedIds.includes(task.id) ? selectedIds.filter(i => i !== task.id) : [...selectedIds, task.id])} />
                 <span className="text-xs font-bold text-blue-600">S.No: {startIndex + index}</span>
               </div>
-              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm ${getStatusColor(task.status)}`}>{task.status}</span>
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getStatusColor(task.status)}`}>{task.status}</span>
             </div>
             <h3 className="font-bold text-gray-900 mb-2">{task.title}</h3>
             <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-3">

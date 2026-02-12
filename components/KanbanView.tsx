@@ -19,15 +19,13 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
   const todayStr = new Date().toLocaleDateString('en-GB');
   
   const filteredTasks = tasks.filter(t => {
-    if (t.status === 'Completed') {
-      if (t.lastUpdateDate) {
-        // Assuming format is DD/MM/YYYY HH:mm
-        const updateDateOnly = t.lastUpdateDate.split(' ')[0];
-        return updateDateOnly === todayStr;
-      }
-      return false;
+    if (t.status !== 'Completed') return true;
+    if (t.lastUpdateDate) {
+      // Assuming format is DD/MM/YYYY HH:mm
+      const updateDateOnly = t.lastUpdateDate.split(' ')[0];
+      return updateDateOnly === todayStr;
     }
-    return true;
+    return false;
   });
   
   // Group tasks by assignee
@@ -125,12 +123,8 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
   };
 
   const getTaskBgColor = (status: string) => {
-    if (status === 'Completed') {
-      return 'bg-green-50';
-    }
-    if (status === 'Not Yet Started' || !status) {
-      return 'bg-white';
-    }
+    if (status === 'Completed') return 'bg-green-50';
+    if (status === 'Not Yet Started' || !status) return 'bg-white';
     // Any other status (In Progress, Pending etc.) is Orange
     return 'bg-orange-50';
   };
