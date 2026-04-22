@@ -102,6 +102,53 @@ export const parseToISO = (str: string) => {
     return trimmed;
 };
 
+export const parseToTimestamp = (dateInput: any): number => {
+  if (!dateInput) return NaN;
+  const s = String(dateInput).trim();
+  if (!s) return NaN;
+
+  // DD/MM/YYYY HH:mm(:ss) (optional AM/PM)
+  const dmY = s.match(
+    /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AP]M)?)?/i
+  );
+  if (dmY) {
+    const day = parseInt(dmY[1], 10);
+    const month = parseInt(dmY[2], 10) - 1;
+    const year = parseInt(dmY[3], 10);
+    let hour = dmY[4] ? parseInt(dmY[4], 10) : 0;
+    const minute = dmY[5] ? parseInt(dmY[5], 10) : 0;
+    const second = dmY[6] ? parseInt(dmY[6], 10) : 0;
+    const ampm = (dmY[7] || '').toUpperCase();
+
+    if (ampm) {
+      if (ampm === 'PM' && hour < 12) hour += 12;
+      if (ampm === 'AM' && hour === 12) hour = 0;
+    }
+
+    const d = new Date(year, month, day, hour, minute, second);
+    const t = d.getTime();
+    return Number.isNaN(t) ? NaN : t;
+  }
+
+  // ISO-like: YYYY-MM-DD or YYYY-MM-DD HH:mm(:ss) or with 'T'
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  if (iso) {
+    const year = parseInt(iso[1], 10);
+    const month = parseInt(iso[2], 10) - 1;
+    const day = parseInt(iso[3], 10);
+    const hour = iso[4] ? parseInt(iso[4], 10) : 0;
+    const minute = iso[5] ? parseInt(iso[5], 10) : 0;
+    const second = iso[6] ? parseInt(iso[6], 10) : 0;
+    const d = new Date(year, month, day, hour, minute, second);
+    const t = d.getTime();
+    return Number.isNaN(t) ? NaN : t;
+  }
+
+  const d = new Date(s);
+  const t = d.getTime();
+  return Number.isNaN(t) ? NaN : t;
+};
+
 async function safeJsonParse(response: Response, sourceName: string) {
   const text = await response.text();
   if (text.toLowerCase().includes("404 file not found") || text.includes("<!DOCTYPE html>")) {

@@ -5,7 +5,7 @@ import { EditTaskModal } from './EditTaskModal';
 import { BulkUpdateModal } from './BulkUpdateModal';
 import { SearchableSelect } from './SearchableSelect';
 import { Task, User, Category, Client, Firm, ActionLogEntry, TaskTemplate } from '../types'; 
-import { parseToISO, formatToIndianDateTime } from '../App';
+import { parseToISO, parseToTimestamp, formatToIndianDateTime } from '../App';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -108,9 +108,32 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
   const paginatedTasks = useMemo(() => {
     const sorted = [...filteredTasks].sort((a, b) => {
-        const aVal = a[sortKey] || '';
-        const bVal = b[sortKey] || '';
-        return sortDir === 'asc' ? (aVal < bVal ? -1 : 1) : (aVal > bVal ? -1 : 1);
+        if (sortKey === 'date' || sortKey === 'lastUpdateDate') {
+          const aTime = parseToTimestamp(a[sortKey]);
+          const bTime = parseToTimestamp(b[sortKey]);
+
+          if (Number.isNaN(aTime) && Number.isNaN(bTime)) return 0;
+          if (Number.isNaN(aTime)) return 1;
+          if (Number.isNaN(bTime)) return -1;
+
+          return sortDir === 'asc' ? aTime - bTime : bTime - aTime;
+        }
+
+        const aVal = a[sortKey] as any;
+        const bVal = b[sortKey] as any;
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+        }
+
+        const aStr = String(aVal ?? '').trim();
+        const bStr = String(bVal ?? '').trim();
+        if (!aStr && !bStr) return 0;
+        if (!aStr) return 1;
+        if (!bStr) return -1;
+
+        const cmp = aStr.localeCompare(bStr, undefined, { numeric: true, sensitivity: 'base' });
+        return sortDir === 'asc' ? cmp : -cmp;
     });
     return sorted.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   }, [filteredTasks, sortKey, sortDir, currentPage]);
