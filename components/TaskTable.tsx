@@ -109,13 +109,23 @@ export const TaskTable: React.FC<TaskTableProps> = ({
             </thead>
             <tbody className="divide-y divide-gray-200">
               {tasks.map((task, index) => {
-                const isSyncing = syncingIds.has(task.id);
-                const hasModificationRights = canModifyTask(task);
-                return (
-                  <tr key={task.id} className={`${getRowBgColor(task.status)} hover:brightness-95 transition-all ${isSyncing ? 'opacity-60' : ''}`}>
-                    <td className={`${tdClass} text-center`}>
-                      <input type="checkbox" className="rounded border-gray-300 text-blue-600 h-4 w-4" checked={selectedIds.includes(task.id)} onChange={() => onSelectionChange(selectedIds.includes(task.id) ? selectedIds.filter(i => i !== task.id) : [...selectedIds, task.id])} />
-                    </td>
+	                const isSyncing = syncingIds.has(task.id);
+	                const hasModificationRights = canModifyTask(task);
+	                return (
+	                  <tr
+	                    key={task.id}
+	                    onDoubleClick={() => onUpdateTask(task)}
+	                    className={`${getRowBgColor(task.status)} hover:brightness-95 transition-all ${isSyncing ? 'opacity-60' : ''} cursor-pointer`}
+	                  >
+	                    <td className={`${tdClass} text-center`}>
+	                      <input
+	                        type="checkbox"
+	                        className="rounded border-gray-300 text-blue-600 h-4 w-4"
+	                        checked={selectedIds.includes(task.id)}
+	                        onChange={() => onSelectionChange(selectedIds.includes(task.id) ? selectedIds.filter(i => i !== task.id) : [...selectedIds, task.id])}
+	                        onDoubleClick={(e) => e.stopPropagation()}
+	                      />
+	                    </td>
                     <td className={`${tdClass} text-center font-bold text-blue-600`}>{startIndex + index}</td>
                     <td className={`${tdClass} whitespace-nowrap`}>{formatToIndianDateTime(task.date)}</td>
                     <td className={tdClass}>{task.createdBy}</td>
@@ -124,19 +134,19 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                     <td className={tdClass}><span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm ${getStatusColor(task.status)}`}>{task.status}</span></td>
                     <td className={`${tdClass} whitespace-nowrap`}>{formatToIndianDateTime(task.lastUpdateDate)}</td>
                     <td className={tdClass}>{task.lastUpdateRemarks || '-'}</td>
-                    <td className={tdClass}>
-                      <div className="flex items-center space-x-2 justify-center">
-                        <button onClick={() => onUpdateTask(task)} disabled={isSyncing} className="px-2 py-1 bg-blue-600 rounded text-xs font-medium text-white hover:bg-blue-700">Update</button>
-                        {/* Edit and Delete icons restricted based on Screenshot 1: only Admin or task creator */}
-                        {hasModificationRights && (
-                          <>
-                            <button onClick={() => onEditTask(task)} disabled={isSyncing} className="p-1 text-blue-600 hover:text-blue-800"><Edit2 size={16} /></button>
-                            <button onClick={() => onDeleteTask(task.id)} disabled={isSyncing} className="p-1 text-red-600 hover:text-red-800"><Trash2 size={16} /></button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+	                    <td className={tdClass}>
+	                      <div className="flex items-center space-x-2 justify-center">
+	                        <button onClick={() => onUpdateTask(task)} onDoubleClick={(e) => e.stopPropagation()} disabled={isSyncing} className="px-2 py-1 bg-blue-600 rounded text-xs font-medium text-white hover:bg-blue-700">Update</button>
+	                        {/* Edit and Delete icons restricted based on Screenshot 1: only Admin or task creator */}
+	                        {hasModificationRights && (
+	                          <>
+	                            <button onClick={() => onEditTask(task)} onDoubleClick={(e) => e.stopPropagation()} disabled={isSyncing} className="p-1 text-blue-600 hover:text-blue-800"><Edit2 size={16} /></button>
+	                            <button onClick={() => onDeleteTask(task.id)} onDoubleClick={(e) => e.stopPropagation()} disabled={isSyncing} className="p-1 text-red-600 hover:text-red-800"><Trash2 size={16} /></button>
+	                          </>
+	                        )}
+	                      </div>
+	                    </td>
+	                  </tr>
                 );
               })}
             </tbody>
@@ -145,15 +155,15 @@ export const TaskTable: React.FC<TaskTableProps> = ({
       </div>
 
       <div className={`space-y-4 md:hidden ${viewMode === 'card' ? 'block' : 'hidden'}`}>
-        {tasks.map((task, index) => {
-          const hasModificationRights = canModifyTask(task);
-          return (
-            <div key={task.id} className={`${getRowBgColor(task.status)} rounded-xl shadow p-4 border border-gray-200`}>
-              <div className="flex justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" className="rounded border-gray-300 text-blue-600 h-4 w-4" checked={selectedIds.includes(task.id)} onChange={() => onSelectionChange(selectedIds.includes(task.id) ? selectedIds.filter(i => i !== task.id) : [...selectedIds, task.id])} />
-                  <span className="text-xs font-bold text-blue-600">S.No: {startIndex + index}</span>
-                </div>
+	        {tasks.map((task, index) => {
+	          const hasModificationRights = canModifyTask(task);
+	          return (
+	            <div key={task.id} onDoubleClick={() => onUpdateTask(task)} className={`${getRowBgColor(task.status)} rounded-xl shadow p-4 border border-gray-200 cursor-pointer`}>
+	              <div className="flex justify-between mb-2">
+	                <div className="flex items-center gap-2">
+	                  <input type="checkbox" className="rounded border-gray-300 text-blue-600 h-4 w-4" checked={selectedIds.includes(task.id)} onChange={() => onSelectionChange(selectedIds.includes(task.id) ? selectedIds.filter(i => i !== task.id) : [...selectedIds, task.id])} onDoubleClick={(e) => e.stopPropagation()} />
+	                  <span className="text-xs font-bold text-blue-600">S.No: {startIndex + index}</span>
+	                </div>
                 <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm ${getStatusColor(task.status)}`}>{task.status}</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">{task.title}</h3>
@@ -162,18 +172,18 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Created By</span>{task.createdBy}</div>
                 <div className="col-span-2"><span className="font-bold block uppercase text-[10px] text-gray-400">Created At</span>{formatToIndianDateTime(task.date)}</div>
               </div>
-              <div className="flex justify-end gap-2 border-t pt-3">
-                {hasModificationRights && (
-                  <>
-                    <button onClick={() => onDeleteTask(task.id)} className="p-2 text-red-600 bg-red-50 rounded"><Trash2 size={18} /></button>
-                    <button onClick={() => onEditTask(task)} className="p-2 text-blue-600 bg-blue-50 rounded"><Edit2 size={18} /></button>
-                  </>
-                )}
-                <button onClick={() => onUpdateTask(task)} className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded uppercase">Update</button>
-              </div>
-            </div>
-          );
-        })}
+	              <div className="flex justify-end gap-2 border-t pt-3">
+	                {hasModificationRights && (
+	                  <>
+	                    <button onClick={() => onDeleteTask(task.id)} onDoubleClick={(e) => e.stopPropagation()} className="p-2 text-red-600 bg-red-50 rounded"><Trash2 size={18} /></button>
+	                    <button onClick={() => onEditTask(task)} onDoubleClick={(e) => e.stopPropagation()} className="p-2 text-blue-600 bg-blue-50 rounded"><Edit2 size={18} /></button>
+	                  </>
+	                )}
+	                <button onClick={() => onUpdateTask(task)} onDoubleClick={(e) => e.stopPropagation()} className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded uppercase">Update</button>
+	              </div>
+	            </div>
+	          );
+	        })}
       </div>
     </>
   );

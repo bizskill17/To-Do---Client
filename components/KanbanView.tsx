@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Task } from '../types';
-import { Edit2, Trello, CheckCircle2, Circle, ArrowUp, ArrowDown } from 'lucide-react';
+import { Edit2, Trello, CheckCircle2, Circle } from 'lucide-react';
 
 interface KanbanViewProps {
   tasks: Task[];
@@ -12,8 +12,6 @@ interface KanbanViewProps {
 export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onEditTask, onOpenUpdateModal }) => {
   // Store custom order for assignees to handle column positioning
   const [customOrder, setCustomOrder] = useState<string[]>([]);
-  // Store custom order for tasks within columns (Map: assignee -> taskId[])
-  const [taskOrderMap, setTaskOrderMap] = useState<Record<string, (string | number)[]>>({});
 
   // Filter logic: show all non-completed tasks + only today's completed tasks
   const todayStr = new Date().toLocaleDateString('en-GB');
@@ -36,37 +34,8 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
     return acc;
   }, {} as Record<string, Task[]>);
 
-  // Determine displayed tasks per group based on custom task ordering
-  const sortedGroupedTasks = useMemo(() => {
-    const result: Record<string, Task[]> = {};
-    Object.keys(groupedTasks).forEach(assignee => {
-      const rawTasks = [...groupedTasks[assignee]];
-      const order = taskOrderMap[assignee] || [];
-      
-      const taskMap = new Map(rawTasks.map(t => [t.id, t]));
-      const orderedTasks: Task[] = [];
-      const usedIds = new Set<string | number>();
-
-      // First, add tasks that have a defined order position
-      order.forEach(id => {
-        const t = taskMap.get(id);
-        if (t) {
-          orderedTasks.push(t);
-          usedIds.add(id);
-        }
-      });
-
-      // Then, append any remaining tasks that aren't manually positioned yet
-      rawTasks.forEach(t => {
-        if (!usedIds.has(t.id)) {
-          orderedTasks.push(t);
-        }
-      });
-
-      result[assignee] = orderedTasks;
-    });
-    return result;
-  }, [groupedTasks, taskOrderMap]);
+  // Keep group ordering stable without manual move arrows
+  const sortedGroupedTasks = useMemo(() => groupedTasks, [groupedTasks]);
 
   // Determine column order: custom order first, then remaining sorted alphabetically
   const assignees = useMemo(() => {
@@ -84,28 +53,6 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
       const others = allGroups.filter(name => name !== assignee && !filtered.includes(name)).sort();
       return [...filtered, ...others, assignee];
     });
-  };
-
-  const handleMoveTask = (e: React.MouseEvent, task: Task, direction: 'up' | 'down') => {
-    e.stopPropagation();
-    const assignee = task.assignee || 'Unassigned';
-    const currentList = [...(sortedGroupedTasks[assignee] || [])];
-    const index = currentList.findIndex(t => t.id === task.id);
-    
-    if (index === -1) return;
-
-    if (direction === 'up' && index > 0) {
-      // Swap with previous task
-      [currentList[index - 1], currentList[index]] = [currentList[index], currentList[index - 1]];
-    } else if (direction === 'down' && index < currentList.length - 1) {
-      // Swap with next task
-      [currentList[index + 1], currentList[index]] = [currentList[index], currentList[index + 1]];
-    } else {
-      return; // At boundary, no swap needed
-    }
-    
-    const newOrder = currentList.map(t => t.id);
-    setTaskOrderMap(prev => ({ ...prev, [assignee]: newOrder }));
   };
 
   const handleToggleComplete = (e: React.MouseEvent, task: Task) => {
@@ -182,25 +129,8 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
                       </h4>
                     </div>
 
-                    {/* Right Reorder Area - Manual step-by-step arrows */}
-                    <div className="flex flex-col border-l border-gray-100 bg-gray-50/30">
-                      <button 
-                        onClick={(e) => handleMoveTask(e, task, 'up')} 
-                        className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors border-b border-gray-100"
-                        title="Move Up"
-                      >
-                        <ArrowUp size={12} />
-                      </button>
-                      <button 
-                        onClick={(e) => handleMoveTask(e, task, 'down')} 
-                        className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
-                        title="Move Down"
-                      >
-                        <ArrowDown size={12} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+	                  </div>
+	                ))}
               </div>
             </div>
           ))}

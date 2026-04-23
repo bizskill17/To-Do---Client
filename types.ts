@@ -28,6 +28,7 @@ export interface Task {
   title: string;
   assigneeId: string;
   assignee: string;
+  assigneeNumber?: string;
   /* Added missing status values to match application logic and fix comparison errors */
   status: 'Not Yet Started' | 'In Progress' | 'Completed' | 'Pending Billing' | 'Pending for Partner' | 'Pending for Leader' | 'Pending for Member' | 'Pending For Team Leader';
   date: string; // Create Date/Time
@@ -121,6 +122,12 @@ export interface AppSettings {
   metaPhoneNumberId: string;
   metaWabaId: string;
   metaVerifyToken: string;
+}
+
+export interface MessageSettings {
+  userId: string;
+  password: string;
+  ownerNumber: string;
 }
 
 export interface TaskTemplate {

@@ -9,6 +9,7 @@ import { BulkAddTaskView } from './components/BulkAddTaskView';
 import { UsersView } from './components/UsersView';
 import { ActionLogView } from './components/ActionLogView';
 import { LoginView } from './components/LoginView';
+import { MessageSettingsView } from './components/MessageSettingsView';
 import { AddTaskModal } from './components/AddTaskModal';
 import { AddCategoryModal } from './components/AddCategoryModal';
 import { AddUserModal } from './components/AddUserModal';
@@ -19,14 +20,15 @@ import { TaskHistoryModal } from './components/TaskHistoryModal';
 import { 
   LayoutDashboard, 
   CheckSquare, 
-  Clock, 
-  CheckCircle, 
-  Users, 
-  Menu,
-  Trello,
-  PlusSquare
+	Clock, 
+	CheckCircle, 
+	Users, 
+	Menu,
+	Trello,
+	PlusSquare,
+	MessageSquare
 } from 'lucide-react';
-import { NavItem, Task, User, Category, Client, Firm, ActionLogEntry, RecurringTask, RecurringTaskAction, AppSettings, TaskTemplate } from './types';
+import { NavItem, Task, User, Category, Client, Firm, ActionLogEntry, RecurringTask, RecurringTaskAction, AppSettings, TaskTemplate, MessageSettings } from './types';
 
 const MASTER_REGISTRY_URL = "https://script.google.com/macros/s/AKfycbzmshqxVyHWCLRl8rhgl254RPDeOJERLPtLj8mvdSBSDbMSusvT9xB-t3mz_Xeqg5tI/exec";
 const AUTO_SYNC_INTERVAL = 120000;
@@ -190,6 +192,7 @@ export default function App() {
     officeTokenId: '', officeTelegramGroupId: '', whatsappGroupId: '', masId: '',
     masPassword: '', metaAccessToken: '', metaPhoneNumberId: '', metaWabaId: '', metaVerifyToken: ''
   });
+  const [messageSettings, setMessageSettings] = useState<MessageSettings>({ userId: '', password: '', ownerNumber: '' });
   const [taskTemplates, setTaskTemplates] = useState<TaskTemplate[]>([]);
 
   const [filterStatus, setFilterStatus] = useState('All Status');
@@ -232,38 +235,53 @@ export default function App() {
       });
       const result = await safeJsonParse(response, targetSheet || 'Initial Load');
       
-      if (result.success) {
-        const { data } = result;
+	      if (result.success) {
+	        const { data } = result;
 
-        const normalizeTasks = (list: any[]) => (list || []).map(item => ({
-            ...item,
-            id: item.taskid || item.id || 0,
-            title: String(item.task || item.title || ''),
-            assigneeId: String(item.assigneeid || ''),
-            assignee: String(item.assignee || ''),
-            status: String(item.status || 'Not Yet Started'),
-            date: formatToIndianDateTime(item.createdatetime || item.date || ''),
-            createdBy: String(item.createdby || ''),
-            lastUpdateDate: formatToIndianDateTime(item.lastupdated || ''),
-            lastUpdateRemarks: String(item.lastupdateremarks || ''),
-        }));
+	        const normalizeTasks = (list: any[]) => (list || []).map(item => ({
+	            ...item,
+	            id: item.taskid || item.id || 0,
+	            title: String(item.task || item.title || ''),
+	            assigneeId: String(item.assigneeid || ''),
+	            assignee: String(item.assignee || ''),
+	            assigneeNumber: String(item.assigneenumber || ''),
+	            status: String(item.status || 'Not Yet Started'),
+	            date: formatToIndianDateTime(item.createdatetime || item.date || ''),
+	            createdBy: String(item.createdby || ''),
+	            lastUpdateDate: formatToIndianDateTime(item.lastupdated || ''),
+	            lastUpdateRemarks: String(item.lastupdateremarks || ''),
+	        }));
 
-        if (targetSheet === 'Tasks') {
-            setTasks(normalizeTasks(data));
-        } else if (!targetSheet) {
-            setTasks(normalizeTasks(data.mainTasks)); 
-            setUsers((data.users || []).map((u: any) => ({ ...u, id: Number(u.id), isActive: String(u.isactive).toUpperCase() === 'TRUE', designation: u.designation || '' })));
-            setClients((data.clients || []).map((c: any) => ({ ...c, id: Number(c.id), name: c.name || '' })));
-            setFirms((data.firms || []).map((f: any) => ({ ...f, id: Number(f.id) }))); 
-            setCategories((data.categories || []).map((c: any) => ({ ...c, id: Number(c.id) })));
-            setActionLogs(data.actionLogs || []);
-            setRecurringTasks(data.recurringTasks || []);
-            setRecurringActions(data.recurringActions || []);
-            setTaskTemplates((data.taskTemplates || []).map((t: any) => ({ ...t, id: Number(t.id), name: String(t.name || ''), category: String(t.category || '') })));
-            if (data.settings) setSettings(data.settings);
-        }
-        setLastSynced(new Date());
-      }
+	        if (targetSheet === 'Tasks') {
+	            setTasks(normalizeTasks(data));
+	        } else if (targetSheet === 'Settings') {
+	            const row = (data && data[0]) ? data[0] : {};
+	            setMessageSettings({
+	              userId: String(row.userid || row.userId || ''),
+	              password: String(row.password || ''),
+	              ownerNumber: String(row.ownernumber || row.ownerNumber || '')
+	            });
+	        } else if (!targetSheet) {
+	            setTasks(normalizeTasks(data.mainTasks)); 
+	            setUsers((data.users || []).map((u: any) => ({ ...u, id: Number(u.id), isActive: String(u.isactive).toUpperCase() === 'TRUE', designation: u.designation || '' })));
+	            setClients((data.clients || []).map((c: any) => ({ ...c, id: Number(c.id), name: c.name || '' })));
+	            setFirms((data.firms || []).map((f: any) => ({ ...f, id: Number(f.id) }))); 
+	            setCategories((data.categories || []).map((c: any) => ({ ...c, id: Number(c.id) })));
+	            setActionLogs(data.actionLogs || []);
+	            setRecurringTasks(data.recurringTasks || []);
+	            setRecurringActions(data.recurringActions || []);
+	            setTaskTemplates((data.taskTemplates || []).map((t: any) => ({ ...t, id: Number(t.id), name: String(t.name || ''), category: String(t.category || '') })));
+	            if (data.settings) setSettings(data.settings);
+	            if (data.messageSettings) {
+	              setMessageSettings({
+	                userId: String(data.messageSettings.userid || data.messageSettings.userId || ''),
+	                password: String(data.messageSettings.password || ''),
+	                ownerNumber: String(data.messageSettings.ownernumber || data.messageSettings.ownerNumber || '')
+	              });
+	            }
+	        }
+	        setLastSynced(new Date());
+	      }
     } catch (error: any) {
       console.error("fetchData error:", error);
     } finally {
@@ -272,29 +290,34 @@ export default function App() {
     }
   }, [apiUrl]);
 
-  const apiPost = useCallback(async (action: string, data: any, target: string) => {
+	  const apiPost = useCallback(async (action: string, data: any, target: string) => {
     if (!apiUrl) return { success: false, error: 'No API URL' };
     setIsSyncing(true);
     const now = new Date();
     const timestamp = now.toLocaleString('en-GB').replace(',', '');
     const payloadData: Record<string, any> = {}; 
 
-    if (action === 'addTask') {
-        payloadData.task = data.title;
-        payloadData.assigneeid = data.assigneeId;
-        payloadData.assignee = data.assignee;
-        payloadData.status = 'Not Yet Started';
-        payloadData.createdatetime = timestamp;
-        payloadData.createdby = currentUser?.name || 'System';
-    } else if (action === 'updateTask') {
-        payloadData.id = data.id;
-        payloadData.status = data.status;
-        payloadData.lastupdated = timestamp;
-        payloadData.lastupdateremarks = data.lastUpdateRemarks;
-    } else {
-        payloadData.id = data.id;
-        for (const key in data) { payloadData[key.toLowerCase().replace(/ /g, '')] = data[key]; }
-    }
+	    if (action === 'addTask') {
+	        payloadData.task = data.title;
+	        payloadData.assigneeid = data.assigneeId;
+	        payloadData.assignee = data.assignee;
+	        payloadData.assigneenumber = data.assigneeNumber || '';
+	        payloadData.status = 'Not Yet Started';
+	        payloadData.createdatetime = timestamp;
+	        payloadData.createdby = currentUser?.name || 'System';
+	    } else if (action === 'updateTask') {
+	        payloadData.id = data.id;
+	        payloadData.status = data.status;
+	        payloadData.lastupdated = timestamp;
+	        payloadData.lastupdateremarks = data.lastUpdateRemarks;
+	    } else if (action === 'saveMessageSettings') {
+	        payloadData.userid = data.userId;
+	        payloadData.password = data.password;
+	        payloadData.ownernumber = data.ownerNumber;
+	    } else {
+	        payloadData.id = data.id;
+	        for (const key in data) { payloadData[key.toLowerCase().replace(/ /g, '')] = data[key]; }
+	    }
 
     const payload = { action, target, data: payloadData, user: currentUser?.name || 'Unknown' };
     try {
@@ -508,24 +531,26 @@ export default function App() {
     }
   }), [users, categories, clients, firms, syncingIds, currentUser, taskTemplates, filterStatus, filterPriority, filterClient, filterOwner, filterAssignee, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo, searchTerm, tasks, apiPost]);
 
-  const navItems: NavItem[] = useMemo(() => [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { id: 'all-tasks', label: 'All Tasks', icon: <CheckSquare size={20} />, section: 'Tasks' },
-    { id: 'kanban', label: 'Kanban View', icon: <Trello size={20} />, section: 'Tasks' },
-    { id: 'bulk-add', label: 'Bulk Add Tasks', icon: <PlusSquare size={20} />, section: 'Tasks' },
-    { id: 'pending', label: 'Pending Tasks', icon: <Clock size={20} />, section: 'Tasks' },
-    { id: 'completed', label: 'Completed Tasks', icon: <CheckCircle size={20} />, section: 'Tasks' },
-    { id: 'users', label: 'Users', icon: <Users size={20} />, section: 'Master' },
-  ], []);
+	  const navItems: NavItem[] = useMemo(() => [
+	    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+	    { id: 'all-tasks', label: 'All Tasks', icon: <CheckSquare size={20} />, section: 'Tasks' },
+	    { id: 'kanban', label: 'Kanban View', icon: <Trello size={20} />, section: 'Tasks' },
+	    { id: 'bulk-add', label: 'Bulk Add Tasks', icon: <PlusSquare size={20} />, section: 'Tasks' },
+	    { id: 'pending', label: 'Pending Tasks', icon: <Clock size={20} />, section: 'Tasks' },
+	    { id: 'completed', label: 'Completed Tasks', icon: <CheckCircle size={20} />, section: 'Tasks' },
+	    { id: 'users', label: 'Users', icon: <Users size={20} />, section: 'Master' },
+	    { id: 'message-settings', label: 'Message Settings', icon: <MessageSquare size={20} />, section: 'Master' },
+	  ], []);
 
   // Filtered nav items based on Admin status: hide Kanban and Users for Employees
-  const filteredNavItems = useMemo(() => {
-    return navItems.filter(item => {
-      if (item.id === 'kanban') return isAdmin;
-      if (item.id === 'users') return isAdmin;
-      return true;
-    });
-  }, [navItems, isAdmin]);
+	  const filteredNavItems = useMemo(() => {
+	    return navItems.filter(item => {
+	      if (item.id === 'kanban') return isAdmin;
+	      if (item.id === 'users') return isAdmin;
+	      if (item.id === 'message-settings') return isAdmin;
+	      return true;
+	    });
+	  }, [navItems, isAdmin]);
 
   if (!currentUser || !apiUrl) return <LoginView onLogin={handleLogin} isAuthenticating={isLoading} savedWorkspaceId={workspaceId} />;
 
@@ -546,18 +571,38 @@ export default function App() {
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-blue-600"><Menu size={24} /></button>
           </header>
         )}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col w-full">
-          <div className="flex-1">{isLoading ? <div className="text-center py-20 font-bold text-indigo-600 animate-pulse">Initializing TASK...</div> : (
-              activeTab === 'dashboard' ? <Dashboard isAdmin={isAdmin} tasks={visibleTasks} users={users} clients={clients} actionLogs={actionLogs} recurringActions={recurringActions} onNavigate={setActiveTab} onFilterChange={handleDashboardFilter} onOpenNewTask={() => setIsTaskModalOpen(true)} onOpenAddUser={() => setIsUserModalOpen(true)} /> :
-              activeTab === 'all-tasks' ? <TasksView title="All Tasks" description="View and manage all tasks" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="all" hideCreationInfo={true} /> :
-              activeTab === 'kanban' ? <KanbanView tasks={visibleTasks} onUpdateTask={handleUpdateTaskOptimistic} onEditTask={(t) => { setSelectedTaskForEdit(t); setIsEditTaskModalOpen(true); }} onOpenUpdateModal={(t) => { setSelectedTaskForUpdate(t); setIsUpdateTaskModalOpen(true); }} /> :
-              activeTab === 'bulk-add' ? <BulkAddTaskView users={users} onBulkAdd={handleBulkAddTask} onCancel={() => setActiveTab('all-tasks')} /> :
-              activeTab === 'pending' ? <TasksView title="Pending Tasks" description="Tasks requiring attention" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="pending" /> :
-              activeTab === 'completed' ? <TasksView title="Completed Tasks" description="Finished task history" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="completed" hideCreationInfo={true} /> :
-              activeTab === 'users' ? <UsersView 
-                users={users} 
-                onAddUser={handleAddUserOptimistic} 
-                onEditUser={u => {
+	        <main className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col w-full">
+	          <div className="flex-1">{isLoading ? (
+	            <div className="w-full h-full flex items-center justify-center py-20">
+	              <div className="flex flex-col items-center gap-4">
+	                <div className="h-12 w-12 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin" />
+	                <div className="font-extrabold text-indigo-600 tracking-wide">LOADING...</div>
+	              </div>
+	            </div>
+	          ) : (
+	              activeTab === 'dashboard' ? <Dashboard isAdmin={isAdmin} tasks={visibleTasks} users={users} clients={clients} actionLogs={actionLogs} recurringActions={recurringActions} onNavigate={setActiveTab} onFilterChange={handleDashboardFilter} onOpenNewTask={() => setIsTaskModalOpen(true)} onOpenAddUser={() => setIsUserModalOpen(true)} /> :
+	              activeTab === 'all-tasks' ? <TasksView title="All Tasks" description="View and manage all tasks" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="all" hideCreationInfo={true} /> :
+	              activeTab === 'kanban' ? <KanbanView tasks={visibleTasks} onUpdateTask={handleUpdateTaskOptimistic} onEditTask={(t) => { setSelectedTaskForEdit(t); setIsEditTaskModalOpen(true); }} onOpenUpdateModal={(t) => { setSelectedTaskForUpdate(t); setIsUpdateTaskModalOpen(true); }} /> :
+	              activeTab === 'bulk-add' ? <BulkAddTaskView users={users} onBulkAdd={handleBulkAddTask} onCancel={() => setActiveTab('all-tasks')} /> :
+	              activeTab === 'pending' ? <TasksView title="Pending Tasks" description="Tasks requiring attention" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="pending" /> :
+	              activeTab === 'completed' ? <TasksView title="Completed Tasks" description="Finished task history" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="completed" hideCreationInfo={true} /> :
+	              activeTab === 'message-settings' ? (
+	                <MessageSettingsView
+	                  settings={messageSettings}
+	                  onSave={async (next) => {
+	                    setMessageSettings(next);
+	                    await apiPost('saveMessageSettings', next, 'Settings');
+	                  }}
+	                  onDelete={async () => {
+	                    setMessageSettings({ userId: '', password: '', ownerNumber: '' });
+	                    await apiPost('deleteMessageSettings', {}, 'Settings');
+	                  }}
+	                />
+	              ) :
+	              activeTab === 'users' ? <UsersView 
+	                users={users} 
+	                onAddUser={handleAddUserOptimistic} 
+	                onEditUser={u => {
                   setUsers(prev => prev.map(user => user.id === u.id ? u : user));
                   apiPost('updateMaster', u, 'Users');
                 }} 
@@ -574,11 +619,11 @@ export default function App() {
                   apiPost('deleteRecord', { id }, 'Users');
                 }} 
               /> :
-              null
-          )}</div>
-          <Footer />
-        </main>
-      </div>
+	              null
+	          )}</div>
+	          <Footer />
+	        </main>
+	      </div>
       <AddTaskModal isOpen={isTaskModalOpen} onClose={() => setIsTaskModalOpen(false)} onSave={handleAddTaskOptimistic} users={users} categories={categories} clients={clients} firms={firms} taskTemplates={taskTemplates} onAddCategory={() => setIsCategoryModalOpen(true)} onAddClient={() => setIsAddClientModalOpen(true)} onAddFirm={() => setIsFirmModalOpen(true)} />
       {/* 
         Comment: Fixed incorrect variable name 'isEditModalOpen' to 'isEditTaskModalOpen' 

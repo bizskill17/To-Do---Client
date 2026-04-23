@@ -142,12 +142,15 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-opacity">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg animate-in fade-in zoom-in duration-200">
         
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
-          <h2 className="text-xl font-bold text-indigo-600">{isConfirming ? 'Confirm Update' : 'Update Status'}</h2>
-          <button 
-            type="button"
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+	        <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
+	          <div className="flex flex-col">
+	            <h2 className="text-xl font-bold text-indigo-600">{isConfirming ? 'Confirm Update' : 'Update Status'}</h2>
+	            <div className="text-xs font-bold text-gray-500 mt-1">({task.title})</div>
+	          </div>
+	          <button 
+	            type="button"
+	            onClick={onClose}
+	            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
           >
             <X size={20} />
           </button>

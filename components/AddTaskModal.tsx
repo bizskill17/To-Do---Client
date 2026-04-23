@@ -22,11 +22,12 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onS
   const [formData, setFormData] = useState({
     title: '',
     assigneeId: '',
-    assignee: ''
+    assignee: '',
+    assigneeNumber: ''
   });
 
   useEffect(() => {
-    if (isOpen) setFormData({ title: '', assigneeId: '', assignee: '' });
+    if (isOpen) setFormData({ title: '', assigneeId: '', assignee: '', assigneeNumber: '' });
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -40,7 +41,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onS
     onSave({
       title: formData.title,
       assigneeId: formData.assigneeId,
-      assignee: formData.assignee
+      assignee: formData.assignee,
+      assigneeNumber: formData.assigneeNumber
     });
     onClose();
   };
@@ -74,7 +76,17 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onS
               label="Assignee" 
               options={userOptions} 
               value={formData.assigneeId} 
-              onChange={(val) => setFormData({...formData, assigneeId: val, assignee: userOptions.find(o => o.value === val)?.label || ''})} 
+              onChange={(val) => {
+                const selected = users.find(u => String(u.id) === String(val));
+                const digitsOnly = String(selected?.mobile || '').replace(/\D/g, '');
+                const normalizedNumber = digitsOnly.length <= 10 ? digitsOnly : digitsOnly.slice(-10);
+                setFormData({
+                  ...formData,
+                  assigneeId: val,
+                  assignee: userOptions.find(o => o.value === val)?.label || '',
+                  assigneeNumber: normalizedNumber
+                });
+              }} 
               required 
               placeholder="Select User..." 
             />
