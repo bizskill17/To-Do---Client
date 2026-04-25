@@ -4,7 +4,6 @@ import { TopBar } from './components/TopBar';
 import { Footer } from './components/Footer';
 import { Dashboard } from './components/Dashboard';
 import { TasksView } from './components/TasksView';
-import { KanbanView } from './components/KanbanView';
 import { BulkAddTaskView } from './components/BulkAddTaskView';
 import { UsersView } from './components/UsersView';
 import { ActionLogView } from './components/ActionLogView';
@@ -26,7 +25,6 @@ import {
 	CheckCircle, 
 	Users, 
 	Menu,
-	Trello,
 	PlusSquare,
 	MessageSquare,
   Building2,
@@ -654,28 +652,26 @@ export default function App() {
     }
 	  }), [users, categories, statuses, clients, firms, syncingIds, currentUser, taskTemplates, taskInsertSignal, filterStatus, filterPriority, filterCategory, filterClient, filterOwner, filterAssignee, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo, searchTerm, tasks, apiPost]);
 
-	  const navItems: NavItem[] = useMemo(() => [
-	    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-	    { id: 'all-tasks', label: 'All Tasks', icon: <CheckSquare size={20} />, section: 'Tasks' },
-	    { id: 'kanban', label: 'Kanban View', icon: <Trello size={20} />, section: 'Tasks' },
-	    { id: 'pending', label: 'Pending Tasks', icon: <Clock size={20} />, section: 'Tasks' },
-      { id: 'pending-billing', label: 'Pending Billing', icon: <PlusSquare size={20} />, section: 'Tasks' },
-	    { id: 'completed', label: 'Completed Tasks', icon: <CheckCircle size={20} />, section: 'Tasks' },
-	    { id: 'users', label: 'Users', icon: <Users size={20} />, section: 'Master' },
+		  const navItems: NavItem[] = useMemo(() => [
+		    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+		    { id: 'all-tasks', label: 'All Tasks', icon: <CheckSquare size={20} />, section: 'Tasks' },
+		    { id: 'pending', label: 'Pending Tasks', icon: <Clock size={20} />, section: 'Tasks' },
+	      { id: 'pending-billing', label: 'Pending Billing', icon: <PlusSquare size={20} />, section: 'Tasks' },
+		    { id: 'completed', label: 'Completed Tasks', icon: <CheckCircle size={20} />, section: 'Tasks' },
+		    { id: 'users', label: 'Users', icon: <Users size={20} />, section: 'Master' },
       { id: 'categories', label: 'Category', icon: <Tags size={20} />, section: 'Master' },
 	    { id: 'clients', label: 'Client Master', icon: <Building2 size={20} />, section: 'Master' },
       { id: 'statuses', label: 'Status', icon: <ListChecks size={20} />, section: 'Master' },
 	    { id: 'message-settings', label: 'Message Settings', icon: <MessageSquare size={20} />, section: 'Master' },
 	  ], []);
 
-  // Filtered nav items based on Admin status: hide Kanban and Users for Employees
-	  const filteredNavItems = useMemo(() => {
-	    return navItems.filter(item => {
-	      if (item.id === 'kanban') return isAdmin;
-	      if (item.id === 'users') return isAdmin;
-	      if (item.id === 'categories') return isAdmin;
-	      if (item.id === 'clients') return isAdmin;
-	      if (item.id === 'statuses') return isAdmin;
+	  // Filtered nav items based on Admin status: hide Kanban and Users for Employees
+		  const filteredNavItems = useMemo(() => {
+		    return navItems.filter(item => {
+		      if (item.id === 'users') return isAdmin;
+		      if (item.id === 'categories') return isAdmin;
+		      if (item.id === 'clients') return isAdmin;
+		      if (item.id === 'statuses') return isAdmin;
 	      if (item.id === 'message-settings') return isAdmin;
 	      return true;
 	    });
@@ -709,12 +705,11 @@ export default function App() {
 	              </div>
 	            </div>
 	          ) : (
-	              activeTab === 'dashboard' ? <Dashboard isAdmin={isAdmin} tasks={visibleTasks} users={users} clients={clients} actionLogs={actionLogs} recurringActions={recurringActions} onNavigate={handleTabChange} onFilterChange={handleDashboardFilter} onOpenNewTask={() => setIsTaskModalOpen(true)} onOpenAddUser={() => setIsUserModalOpen(true)} onOpenAddClient={() => setIsAddClientModalOpen(true)} /> :
-	              activeTab === 'all-tasks' ? <TasksView title="All Tasks" description="View and manage all tasks" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="all" hideCreationInfo={true} /> :
-	              activeTab === 'kanban' ? <KanbanView tasks={visibleTasks} onUpdateTask={handleUpdateTaskOptimistic} onEditTask={(t) => { setSelectedTaskForEdit(t); setIsEditTaskModalOpen(true); }} onOpenUpdateModal={(t) => { setSelectedTaskForUpdate(t); setIsUpdateTaskModalOpen(true); }} /> :
-	              activeTab === 'bulk-add' ? <BulkAddTaskView users={users} onBulkAdd={handleBulkAddTask} onCancel={() => setActiveTab('all-tasks')} /> :
-	              activeTab === 'pending' ? <TasksView title="Pending Tasks" description="Tasks requiring attention" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="pending" /> :
-                activeTab === 'pending-billing' ? <TasksView title="Pending Billing" description="Completed billable tasks waiting for billing update" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="pending-billing" /> :
+		              activeTab === 'dashboard' ? <Dashboard isAdmin={isAdmin} tasks={visibleTasks} users={users} clients={clients} actionLogs={actionLogs} recurringActions={recurringActions} onNavigate={handleTabChange} onFilterChange={handleDashboardFilter} onOpenNewTask={() => setIsTaskModalOpen(true)} onOpenAddUser={() => setIsUserModalOpen(true)} onOpenAddClient={() => setIsAddClientModalOpen(true)} /> :
+		              activeTab === 'all-tasks' ? <TasksView title="All Tasks" description="View and manage all tasks" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="all" hideCreationInfo={true} /> :
+		              activeTab === 'bulk-add' ? <BulkAddTaskView users={users} onBulkAdd={handleBulkAddTask} onCancel={() => setActiveTab('all-tasks')} /> :
+		              activeTab === 'pending' ? <TasksView title="Pending Tasks" description="Tasks requiring attention" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="pending" /> :
+	                activeTab === 'pending-billing' ? <TasksView title="Pending Billing" description="Completed billable tasks waiting for billing update" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="pending-billing" /> :
 	              activeTab === 'completed' ? <TasksView title="Completed Tasks" description="Finished task history" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="completed" hideCreationInfo={true} /> :
                 activeTab === 'categories' ? <CategoriesView
                   categories={categories}
