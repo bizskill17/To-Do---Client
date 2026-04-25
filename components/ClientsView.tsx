@@ -88,8 +88,8 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
     }
   };
 
-  const thClass = "px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider border-r border-indigo-500 last:border-r-0 cursor-pointer hover:bg-indigo-700 transition-colors select-none";
-  const tdClass = "px-6 py-4 text-sm text-gray-900 border-r border-gray-200 last:border-r-0";
+  const thClass = "px-4 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-indigo-500 last:border-r-0 cursor-pointer hover:bg-indigo-700 transition-colors select-none";
+  const tdClass = "px-4 py-3 text-sm text-gray-900 border-r border-gray-200 last:border-r-0";
 
   return (
     <div className="space-y-6 pb-10">
@@ -140,17 +140,17 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
 
       {/* Table View */}
       <div className={`bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden ${viewMode === 'card' ? 'hidden md:block' : 'block'}`}>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-indigo-600">
-                <th className={thClass} onClick={() => requestSort('name')}>
+                <th className={`${thClass} w-[55%]`} onClick={() => requestSort('name')}>
                   <div className="flex items-center">Client Name {getSortIcon('name')}</div>
                 </th>
-                <th className={thClass} onClick={() => requestSort('mobile')}>
+                <th className={`${thClass} w-[25%]`} onClick={() => requestSort('mobile')}>
                   <div className="flex items-center">Client Mobile Number {getSortIcon('mobile')}</div>
                 </th>
-                <th className="px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider text-center">Actions</th>
+                <th className="px-4 py-3 w-[20%] text-xs font-semibold text-white uppercase tracking-wider text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">

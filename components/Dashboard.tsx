@@ -106,6 +106,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
     getGroupedData('assignee').sort((a, b) => a.name.localeCompare(b.name)), 
   [activeTasks]);
 
+  const clientData = useMemo(() =>
+    getGroupedData('clientName').sort((a, b) => a.name.localeCompare(b.name)),
+  [activeTasks]);
+
   const SectionHeader = ({ title, icon }: { title: string; icon: React.ReactNode }) => (
     <div className="flex items-center gap-2 mb-4">
         <span className="p-1.5 bg-blue-100 text-blue-700 rounded-lg">{icon}</span>
@@ -145,6 +149,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       <div className="grid grid-cols-1 gap-8">
         <PendingTable title="Pending by Assignee" headerLabel="Assignee Name" data={assigneeData} onRowClick={(name) => onFilterChange('assignee-pending', name)} />
+        <PendingTable title="Pending by Client" headerLabel="Client Name" data={clientData} onRowClick={() => {}} />
       </div>
 
       <div className="bg-blue-50/70 p-6 rounded-2xl border-2 border-blue-300 shadow-sm mt-8">

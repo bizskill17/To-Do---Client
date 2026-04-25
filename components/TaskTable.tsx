@@ -54,13 +54,13 @@ export const TaskTable: React.FC<TaskTableProps> = ({
 
   const getStatusColor = (status: string) => {
     if (status === 'Completed' || status === 'Complete') {
-      return 'bg-green-100 text-green-700 border border-green-200';
+      return 'text-green-700';
     }
     if (status === 'Not Yet Started' || !status) {
-      return 'bg-gray-100 text-gray-700 border border-gray-200';
+      return 'text-gray-700';
     }
     // Any other status (In Progress, Pending etc.) is Orange
-    return 'bg-orange-100 text-orange-700 border border-orange-200';
+    return 'text-orange-700';
   };
 
   const getRowBgColor = (status: string) => {
@@ -82,8 +82,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({
     return taskCreator === currentUserName;
   };
 
-  const thClass = "px-4 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-600 last:border-r-0 cursor-pointer hover:bg-blue-800 transition-colors select-none";
-  const tdClass = "px-4 py-3 text-sm text-black border-r border-gray-200 last:border-r-0 align-top";
+  const thClass = "px-3 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-600 last:border-r-0 cursor-pointer hover:bg-blue-800 transition-colors select-none";
+  const tdClass = "px-3 py-3 text-sm text-black border-r border-gray-200 last:border-r-0 align-top";
 
   return (
     <>
@@ -92,22 +92,21 @@ export const TaskTable: React.FC<TaskTableProps> = ({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-blue-700 border-b border-blue-800">
-                <th className="px-4 py-3 w-10 text-center border-r border-blue-600">
+                <th className="px-2 py-3 w-8 text-center border-r border-blue-600">
                   <input type="checkbox" className="rounded border-gray-300 text-blue-600 h-4 w-4" checked={tasks.length > 0 && selectedIds.length === tasks.length} onChange={handleSelectAll} />
                 </th>
-                <th className={thClass} onClick={() => requestSort('id')}><div className="flex items-center">S.No. {getSortIcon('id')}</div></th>
-                <th className={thClass} onClick={() => requestSort('date')}><div className="flex items-center">Create Date/Time {getSortIcon('date')}</div></th>
-                <th className={thClass} onClick={() => requestSort('createdBy')}><div className="flex items-center">Created By {getSortIcon('createdBy')}</div></th>
+                <th className={`${thClass} min-w-[56px]`} onClick={() => requestSort('id')}><div className="flex items-center">S.No. {getSortIcon('id')}</div></th>
+                <th className={`${thClass} min-w-[120px]`} onClick={() => requestSort('date')}><div className="flex items-center">Create Date/Time {getSortIcon('date')}</div></th>
+                <th className={`${thClass} min-w-[90px]`} onClick={() => requestSort('createdBy')}><div className="flex items-center">Created By {getSortIcon('createdBy')}</div></th>
                 <th className={`${thClass} min-w-[300px]`} onClick={() => requestSort('title')}><div className="flex items-center">Task {getSortIcon('title')}</div></th>
                 <th className={`${thClass} min-w-[220px]`} onClick={() => requestSort('clientName')}><div className="flex items-center">Client {getSortIcon('clientName')}</div></th>
-                <th className={thClass} onClick={() => requestSort('clientMobile')}><div className="flex items-center">Client Mobile {getSortIcon('clientMobile')}</div></th>
-                <th className={thClass} onClick={() => requestSort('dueDate')}><div className="flex items-center">Due Date {getSortIcon('dueDate')}</div></th>
+                <th className={`${thClass} min-w-[90px]`} onClick={() => requestSort('clientMobile')}><div className="flex items-center">Client Mobile {getSortIcon('clientMobile')}</div></th>
+                <th className={`${thClass} min-w-[80px]`} onClick={() => requestSort('dueDate')}><div className="flex items-center">Due Date {getSortIcon('dueDate')}</div></th>
                 <th className={thClass} onClick={() => requestSort('assignee')}><div className="flex items-center">Assignee {getSortIcon('assignee')}</div></th>
                 <th className={thClass} onClick={() => requestSort('status')}><div className="flex items-center">Status {getSortIcon('status')}</div></th>
-                <th className={thClass} onClick={() => requestSort('lastUpdateDate')}><div className="flex items-center">Last Updated {getSortIcon('lastUpdateDate')}</div></th>
-                {/* Increased column size for Remarks to satisfy Screenshot 2 */}
-                <th className={`${thClass} min-w-[400px]`} onClick={() => requestSort('lastUpdateRemarks')}><div className="flex items-center">Remarks {getSortIcon('lastUpdateRemarks')}</div></th>
-                <th className="px-4 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-600 last:border-r-0 text-center">Actions</th>
+                <th className={`${thClass} min-w-[120px]`} onClick={() => requestSort('lastUpdateDate')}><div className="flex items-center">Last Updated {getSortIcon('lastUpdateDate')}</div></th>
+                <th className={`${thClass} min-w-[110px]`} onClick={() => requestSort('lastUpdateRemarks')}><div className="flex items-center">Remarks {getSortIcon('lastUpdateRemarks')}</div></th>
+                <th className="px-3 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-600 last:border-r-0 text-center min-w-[90px]">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -120,7 +119,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
 	                    onDoubleClick={() => onUpdateTask(task)}
 	                    className={`${getRowBgColor(task.status)} hover:brightness-95 transition-all ${isSyncing ? 'opacity-60' : ''} cursor-pointer`}
 	                  >
-	                    <td className={`${tdClass} text-center`}>
+	                    <td className={`${tdClass} text-center px-2`}>
 	                      <input
 	                        type="checkbox"
 	                        className="rounded border-gray-300 text-blue-600 h-4 w-4"
@@ -137,7 +136,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                     <td className={tdClass}>{task.clientMobile || '-'}</td>
                     <td className={`${tdClass} whitespace-nowrap`}>{task.dueDate || '-'}</td>
                     <td className={tdClass}>{task.assignee}</td>
-                    <td className={tdClass}><span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm ${getStatusColor(task.status)}`}>{task.status}</span></td>
+                    <td className={tdClass}><span className={`text-[10px] font-bold uppercase tracking-wider ${getStatusColor(task.status)}`}>{task.status}</span></td>
                     <td className={`${tdClass} whitespace-nowrap`}>{formatToIndianDateTime(task.lastUpdateDate)}</td>
                     <td className={tdClass}>{task.lastUpdateRemarks || '-'}</td>
 	                    <td className={tdClass}>
@@ -170,7 +169,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
 	                  <input type="checkbox" className="rounded border-gray-300 text-blue-600 h-4 w-4" checked={selectedIds.includes(task.id)} onChange={() => onSelectionChange(selectedIds.includes(task.id) ? selectedIds.filter(i => i !== task.id) : [...selectedIds, task.id])} onDoubleClick={(e) => e.stopPropagation()} />
 	                  <span className="text-xs font-bold text-blue-600">S.No: {startIndex + index}</span>
 	                </div>
-                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm ${getStatusColor(task.status)}`}>{task.status}</span>
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${getStatusColor(task.status)}`}>{task.status}</span>
               </div>
               <h3 className="font-bold text-gray-900 mb-2">{task.title}</h3>
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-3">

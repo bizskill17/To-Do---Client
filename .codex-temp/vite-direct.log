@@ -610,3 +610,57 @@
 2026-04-25T05:58:19.803Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
 2026-04-25T05:58:19.803Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
 2026-04-25T05:58:19.803Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:58:25.477Z vite:hmr [file change] [2m.gitignore[22m
+2026-04-25T05:58:25.477Z vite:hmr (client) [no modules matched] [2m.gitignore[22m
+2026-04-25T05:58:25.477Z vite:hmr (ssr) [no modules matched] [2m.gitignore[22m
+2026-04-25T06:00:00.827Z vite:hmr [file change] [2m.gitignore[22m
+2026-04-25T06:00:00.827Z vite:hmr (client) [no modules matched] [2m.gitignore[22m
+2026-04-25T06:00:00.827Z vite:hmr (ssr) [no modules matched] [2m.gitignore[22m
+2026-04-25T06:00:24.703Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T06:00:24.703Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T06:00:24.703Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T06:53:19.828Z vite:hmr [file change] [2mApp.tsx[22m
+2026-04-25T06:53:19.828Z vite:hmr (client) [no modules matched] [2mApp.tsx[22m
+2026-04-25T06:53:19.828Z vite:hmr (ssr) [no modules matched] [2mApp.tsx[22m
+2026-04-25T06:54:25.228Z vite:hmr [file change] [2mApp.tsx[22m
+2026-04-25T06:54:25.228Z vite:hmr (client) [no modules matched] [2mApp.tsx[22m
+2026-04-25T06:54:25.228Z vite:hmr (ssr) [no modules matched] [2mApp.tsx[22m
+2026-04-25T06:55:30.882Z vite:hmr [file change] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T06:55:30.883Z vite:hmr (client) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T06:55:30.883Z vite:hmr (ssr) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T06:58:51.957Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T06:58:51.957Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T06:58:51.957Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T06:59:10.134Z vite:hmr [file change] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T06:59:10.135Z vite:hmr (client) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T06:59:10.135Z vite:hmr (ssr) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T07:00:16.094Z vite:hmr [file change] [2mcomponents/TasksView.tsx[22m
+2026-04-25T07:00:16.094Z vite:hmr (client) [no modules matched] [2mcomponents/TasksView.tsx[22m
+2026-04-25T07:00:16.094Z vite:hmr (ssr) [no modules matched] [2mcomponents/TasksView.tsx[22m
+2026-04-25T07:00:27.543Z vite:hmr [file change] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T07:00:27.544Z vite:hmr (client) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T07:00:27.544Z vite:hmr (ssr) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T07:02:25.533Z vite:hmr [file change] [2mcomponents/TasksView.tsx[22m
+2026-04-25T07:02:25.534Z vite:hmr (client) [no modules matched] [2mcomponents/TasksView.tsx[22m
+2026-04-25T07:02:25.534Z vite:hmr (ssr) [no modules matched] [2mcomponents/TasksView.tsx[22m
+2026-04-25T07:02:33.250Z vite:hmr [file change] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T07:02:33.250Z vite:hmr (client) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T07:02:33.250Z vite:hmr (ssr) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T07:04:51.696Z vite:hmr [file change] [2mcomponents/MessageSettingsView.tsx[22m
+2026-04-25T07:04:51.696Z vite:hmr (client) [no modules matched] [2mcomponents/MessageSettingsView.tsx[22m
+2026-04-25T07:04:51.696Z vite:hmr (ssr) [no modules matched] [2mcomponents/MessageSettingsView.tsx[22m
+2026-04-25T07:05:58.781Z vite:hmr [file change] [2mcomponents/MessageSettingsView.tsx[22m
+2026-04-25T07:05:58.781Z vite:hmr (client) [no modules matched] [2mcomponents/MessageSettingsView.tsx[22m
+2026-04-25T07:05:58.781Z vite:hmr (ssr) [no modules matched] [2mcomponents/MessageSettingsView.tsx[22m
+2026-04-25T07:07:51.302Z vite:hmr [file change] [2mApp.tsx[22m
+2026-04-25T07:07:51.302Z vite:hmr (client) [no modules matched] [2mApp.tsx[22m
+2026-04-25T07:07:51.302Z vite:hmr (ssr) [no modules matched] [2mApp.tsx[22m
+2026-04-25T07:08:07.359Z vite:hmr [file change] [2mcomponents/ClientsView.tsx[22m
+2026-04-25T07:08:07.359Z vite:hmr (client) [no modules matched] [2mcomponents/ClientsView.tsx[22m
+2026-04-25T07:08:07.359Z vite:hmr (ssr) [no modules matched] [2mcomponents/ClientsView.tsx[22m
+2026-04-25T07:12:28.011Z vite:hmr [file change] [2mcomponents/Dashboard.tsx[22m
+2026-04-25T07:12:28.011Z vite:hmr (client) [no modules matched] [2mcomponents/Dashboard.tsx[22m
+2026-04-25T07:12:28.011Z vite:hmr (ssr) [no modules matched] [2mcomponents/Dashboard.tsx[22m
+2026-04-25T07:22:33.000Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T07:22:33.000Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T07:22:33.000Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m

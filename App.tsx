@@ -601,7 +601,7 @@ export default function App() {
   if (!currentUser || !apiUrl) return <LoginView onLogin={handleLogin} isAuthenticating={isLoading} savedWorkspaceId={workspaceId} />;
 
   return (
-    <div className={`flex h-screen bg-gray-50 overflow-hidden flex-col ${layoutMode === 'side' ? 'md:flex-row' : 'md:flex-col'}`}>
+    <div className={`flex h-screen bg-gray-50 overflow-x-hidden overflow-y-hidden flex-col origin-top-left md:[zoom:0.8] md:h-[125vh] ${layoutMode === 'side' ? 'md:flex-row' : 'md:flex-col'}`}>
       {layoutMode === 'side' ? (
         <Sidebar items={filteredNavItems} activeTab={activeTab} onTabChange={setActiveTab} onLayoutChange={setLayoutMode} layoutMode={layoutMode} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} lastSynced={lastSynced} isSyncing={isSyncing} onSync={() => fetchData()} onLogout={() => { setCurrentUser(null); localStorage.removeItem('taskpro_user'); }} onExitWorkspace={() => { setCurrentUser(null); localStorage.clear(); }} workspaceId={workspaceId} />
       ) : (
