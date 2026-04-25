@@ -14,7 +14,8 @@ const SHEETS = {
   USERS: 'Users', // Updated from 'Assignees' to 'Users'
   CLIENTS: 'Client',
   FIRMS: 'Firms',
-  CATEGORIES: 'Categories',
+  CATEGORIES: 'Category',
+  STATUSES: 'Status',
   TEMPLATES: 'TaskTemplates',
   SETTINGS: 'AppSettings',
   MESSAGE_SETTINGS: 'Settings'
@@ -100,12 +101,14 @@ function formatAnyDateToIndian(dateValue) {
   return str;
 }
 
-function buildTaskSummaryMessage(taskTitle, createdBy, assigneeName, createdAt, clientName, dueDate) {
+function buildTaskSummaryMessage(taskTitle, createdBy, assigneeName, createdAt, clientName, category, billable, dueDate) {
   return [
     "*NEW TASK ASSIGNED*",
     taskTitle ? `Task: ${taskTitle}` : null,
     assigneeName ? `Assignee: ${assigneeName}` : null,
     clientName ? `Client: ${clientName}` : null,
+    category ? `Category: ${category}` : null,
+    billable ? `Billable: ${billable}` : null,
     dueDate ? `Due Date: ${formatAnyDateToIndian(dueDate)}` : null,
     createdBy ? `Created By: ${createdBy}` : null,
     createdAt ? `Created At: ${Utilities.formatDate(createdAt, Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm")}` : null
@@ -214,6 +217,7 @@ function doGet(e) {
 	        clients: sheetToJSON(SHEETS.CLIENTS),
 	        firms: sheetToJSON(SHEETS.FIRMS),
 	        categories: sheetToJSON(SHEETS.CATEGORIES),
+          statuses: sheetToJSON(SHEETS.STATUSES),
 	        actionLogs: sheetToJSON(SHEETS.LOGS),
 	        recurringTasks: sheetToJSON(SHEETS.RECURRING),
 	        recurringActions: sheetToJSON(SHEETS.REC_ACTIONS),
@@ -290,8 +294,10 @@ function handleAddTask(data) {
       getUserMobileByAssignee(assigneeName || normalizedData.assigneeid);
     const ownerNumber = getMessageSettingsRow().ownerNumber;
     const clientName = String(normalizedData.clientname || '');
+    const category = String(normalizedData.category || '');
+    const billable = String(normalizedData.billable || '');
     const dueDate = normalizedData.duedate || '';
-    const msg = buildTaskSummaryMessage(taskTitle, createdBy, assigneeName, createdAt, clientName, dueDate);
+    const msg = buildTaskSummaryMessage(taskTitle, createdBy, assigneeName, createdAt, clientName, category, billable, dueDate);
     Logger.log("Assign recipients. Assignee: " + assigneeMobile + " Owner: " + ownerNumber);
     if (assigneeMobile) sendWhatsAppMessage(assigneeMobile, msg);
     if (ownerNumber) sendWhatsAppMessage(ownerNumber, msg);
@@ -328,6 +334,9 @@ function handleUpdateTask(data) {
 
   // Send WhatsApp message only to Owner on update
   try {
+    if (String(data.skipmessage || '').toUpperCase() === 'TRUE') {
+      return { success: true };
+    }
     const status = String(data.status || '');
     const remarks = String(data.lastupdateremarks || data.remarks || '');
     const normalizedHeaders = headers.map(x => String(x || '').trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
@@ -361,6 +370,7 @@ function handleAddMaster(target, data) {
     if (hLower === 'id' || hLower.endsWith('id')) return id;
     const key = Object.keys(data).find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === hLower);
     if (key) return data[key];
+    if (headers.length === 1 && data.name !== undefined) return data.name;
     if (target === SHEETS.CLIENTS) {
       if (hLower === 'clientname') return data.name || data.clientname || '';
       if (hLower === 'clientmobilenumber') return data.mobile || data.clientmobilenumber || '';
@@ -386,6 +396,10 @@ function handleUpdateMaster(target, data) {
     const key = Object.keys(data).find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === hLower);
     if (key && hLower !== 'id' && !hLower.endsWith('id')) {
       sheet.getRange(rowIndex, i + 1).setValue(data[key]);
+      return;
+    }
+    if (headers.length === 1 && data.name !== undefined) {
+      sheet.getRange(rowIndex, i + 1).setValue(data.name);
       return;
     }
     if (target === SHEETS.CLIENTS) {

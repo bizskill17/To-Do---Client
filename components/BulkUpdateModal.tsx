@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, AlertTriangle } from 'lucide-react';
 // Fix: Removed Vendor from types import.
-import { Task, User, Client } from '../types'; 
+import { Task, User, Client, StatusOption } from '../types'; 
 import { SearchableSelect } from './SearchableSelect';
 
 interface BulkUpdateModalProps {
@@ -11,9 +11,10 @@ interface BulkUpdateModalProps {
   count: number;
   onUpdate: (updates: Partial<Task>) => void;
   users: User[];
+  statuses?: StatusOption[];
   // Fix: Replaced vendors with clients. Removed isVendorView.
   clients?: Client[]; 
-  mode: 'status' | 'priority' | 'assignee' | 'teamMembers'; // Added 'teamMembers'
+  mode: 'status' | 'billing' | 'priority' | 'assignee' | 'teamMembers'; // Added 'teamMembers'
 }
 
 export const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({ 
@@ -22,13 +23,15 @@ export const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({
   count, 
   onUpdate, 
   users, 
+  statuses = [],
   // Fix: Renamed vendors to clients
   clients = [],
   // Fix: Removed isVendorView
   mode
 }) => {
-  const [formData, setFormData] = useState<{status: string; priority: string; remarks: string}>({
+  const [formData, setFormData] = useState<{status: string; billingStatus: string; priority: string; remarks: string}>({
     status: '',
+    billingStatus: '',
     priority: '',
     remarks: ''
   });
@@ -39,7 +42,7 @@ export const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-        setFormData({ status: '', priority: '', remarks: '' });
+        setFormData({ status: '', billingStatus: '', priority: '', remarks: '' });
         // Fix: Removed isVendorView check
         setReassignSelection([]); 
         setError('');
@@ -61,6 +64,7 @@ export const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({
     
     let hasValidInput = false;
     if (mode === 'status' && formData.status) hasValidInput = true;
+    if (mode === 'billing' && formData.billingStatus) hasValidInput = true;
     if (mode === 'priority' && formData.priority) hasValidInput = true;
     if (mode === 'assignee' || mode === 'teamMembers') {
         const selCount = Array.isArray(reassignSelection) ? reassignSelection.length : (reassignSelection ? 1 : 0);
@@ -85,6 +89,10 @@ export const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({
     if (mode === 'status' && formData.status) {
         updates.status = formData.status;
         updates.lastUpdateRemarks = formData.remarks;
+    }
+    if (mode === 'billing' && formData.billingStatus) {
+        updates.billingStatus = formData.billingStatus;
+        updates.skipMessage = true as any;
     }
     if (mode === 'priority' && formData.priority) {
         updates.priority = formData.priority;
@@ -114,10 +122,12 @@ export const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({
   
   const assigneeOptions = teamLeaderUsers.map(u => ({ value: u.name, label: u.name }));
   const teamMemberOptions = teamMemberUsers.map(u => ({ value: u.name, label: u.name }));
+  const statusOptions = statuses.map(s => s.name).filter(Boolean);
 
   const getTitle = () => {
     switch(mode) {
         case 'status': return 'Bulk Status Update';
+        case 'billing': return 'Bulk Billing Status Update';
         case 'priority': return 'Bulk Priority Update';
         case 'assignee': return 'Bulk Team Leader Update';
         case 'teamMembers': return 'Bulk Team Members Update';
@@ -159,13 +169,20 @@ export const BulkUpdateModal: React.FC<BulkUpdateModalProps> = ({
 
               {mode === 'status' && (
                   <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-900 block mb-1">New Status</label>
+                      <label className="text-sm font-medium text-gray-900 block mb-1">Status</label>
                       <select name="status" value={formData.status} onChange={handleChange} className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-indigo-100 outline-none">
                           <option value="">Select Status...</option>
-                          <option value="In Progress">In Progress</option>
-                          <option value="Pending for Partner">Pending for Partner</option>
-                          <option value="Pending for Leader">Pending for Leader</option>
-                          <option value="Completed">Completed</option>
+                          {statusOptions.map(status => <option key={status} value={status}>{status}</option>)}
+                      </select>
+                  </div>
+              )}
+
+              {mode === 'billing' && (
+                  <div className="space-y-1">
+                      <label className="text-sm font-medium text-gray-900 block mb-1">Billing Status</label>
+                      <select name="billingStatus" value={formData.billingStatus} onChange={handleChange} className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-indigo-100 outline-none">
+                          <option value="">Select Billing Status...</option>
+                          <option value="Done">Done</option>
                       </select>
                   </div>
               )}

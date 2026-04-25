@@ -88,8 +88,8 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
     }
   };
 
-  const thClass = "px-4 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-indigo-500 last:border-r-0 cursor-pointer hover:bg-indigo-700 transition-colors select-none";
-  const tdClass = "px-4 py-3 text-sm text-gray-900 border-r border-gray-200 last:border-r-0";
+  const thClass = "px-4 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-900 last:border-r-0 cursor-pointer hover:bg-indigo-700 transition-colors select-none";
+  const tdClass = "px-4 py-3 text-sm text-gray-900 border-r border-blue-900 last:border-r-0";
 
   return (
     <div className="space-y-6 pb-10">
@@ -153,7 +153,7 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
                 <th className="px-4 py-3 w-[20%] text-xs font-semibold text-white uppercase tracking-wider text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-blue-900">
               {sortedClients.map((client) => (
                 <tr key={client.id} className="hover:bg-gray-50 transition-colors">
                   <td className={`${tdClass} font-medium`}>{client.name}</td>

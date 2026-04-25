@@ -19,7 +19,7 @@ interface EditTaskModalProps {
   taskTemplates: TaskTemplate[];
 }
 
-export const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, onClose, task, onSave, users, clients }) => {
+export const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, onClose, task, onSave, users, categories, clients }) => {
   const [formData, setFormData] = useState<Partial<Task>>({});
 
   useEffect(() => {
@@ -31,6 +31,7 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, onClose, t
   // Showing all names present in User Table (no filtering for active status)
   const userOptions = users.map(u => ({ value: String(u.id), label: u.name }));
   const clientOptions = clients.map(c => ({ value: String(c.id), label: c.name }));
+  const categoryOptions = categories.map(c => ({ value: c.name, label: c.name }));
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -84,6 +85,26 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, onClose, t
               }}
               required
             />
+          </div>
+          <div className="space-y-1">
+            <SearchableSelect
+              label="Category"
+              options={categoryOptions}
+              value={String(formData.category || '')}
+              onChange={(val) => setFormData({ ...formData, category: val })}
+              required
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-bold text-gray-700">Billable *</label>
+            <select
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
+              value={String(formData.billable || 'No')}
+              onChange={e => setFormData({ ...formData, billable: e.target.value })}
+            >
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
           </div>
           <div className="space-y-1">
             <label className="text-sm font-bold text-gray-700">Due Date *</label>

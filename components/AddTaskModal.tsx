@@ -18,7 +18,7 @@ interface AddTaskModalProps {
   taskTemplates: TaskTemplate[]; 
 }
 
-export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onSave, users, clients }) => {
+export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onSave, users, categories, clients }) => {
   const [formData, setFormData] = useState({
     title: '',
     assigneeId: '',
@@ -27,11 +27,13 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onS
     clientId: '',
     clientName: '',
     clientMobile: '',
+    category: '',
+    billable: 'No',
     dueDate: ''
   });
 
   useEffect(() => {
-    if (isOpen) setFormData({ title: '', assigneeId: '', assignee: '', assigneeNumber: '', clientId: '', clientName: '', clientMobile: '', dueDate: '' });
+    if (isOpen) setFormData({ title: '', assigneeId: '', assignee: '', assigneeNumber: '', clientId: '', clientName: '', clientMobile: '', category: '', billable: 'No', dueDate: '' });
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -39,10 +41,11 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onS
   // Showing all names present in User Table (no filtering for active status)
   const userOptions = users.map(u => ({ value: String(u.id), label: u.name }));
   const clientOptions = clients.map(c => ({ value: String(c.id), label: c.name }));
+  const categoryOptions = categories.map(c => ({ value: c.name, label: c.name }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.assigneeId || !formData.clientId || !formData.dueDate) return;
+    if (!formData.title || !formData.assigneeId || !formData.clientId || !formData.category || !formData.dueDate) return;
     onSave({
       title: formData.title,
       assigneeId: formData.assigneeId,
@@ -51,6 +54,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onS
       clientId: formData.clientId,
       clientName: formData.clientName,
       clientMobile: formData.clientMobile,
+      category: formData.category,
+      billable: formData.billable,
       dueDate: formData.dueDate
     });
     onClose();
@@ -117,6 +122,27 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onS
               required
               placeholder="Select Client..."
             />
+          </div>
+          <div className="space-y-1">
+            <SearchableSelect
+              label="Category"
+              options={categoryOptions}
+              value={formData.category}
+              onChange={(val) => setFormData({ ...formData, category: val })}
+              required
+              placeholder="Select Category..."
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-bold text-gray-700">Billable *</label>
+            <select
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
+              value={formData.billable}
+              onChange={e => setFormData({ ...formData, billable: e.target.value })}
+            >
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
           </div>
           <div className="space-y-1">
             <label className="text-sm font-bold text-gray-700">Due Date *</label>

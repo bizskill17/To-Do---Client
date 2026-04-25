@@ -45,8 +45,8 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onToggleStatus, onD
     return sortableItems;
   }, [users, sortConfig]);
 
-  const thClass = "px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider border-r border-indigo-500 last:border-r-0 cursor-pointer hover:bg-indigo-700 transition-colors select-none";
-  const tdClass = "px-6 py-4 text-sm text-gray-900 border-r border-gray-200 last:border-r-0";
+  const thClass = "px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-900 last:border-r-0 cursor-pointer hover:bg-indigo-700 transition-colors select-none";
+  const tdClass = "px-6 py-4 text-sm text-gray-900 border-r border-blue-900 last:border-r-0";
 
   return (
     <>
@@ -79,10 +79,10 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onToggleStatus, onD
               <th className={thClass} onClick={() => requestSort('isActive')}>
                 <div className="flex items-center justify-center">Status {getSortIcon('isActive')}</div>
               </th>
-              <th className="px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider border-r border-indigo-500 last:border-r-0 text-center">Actions</th>
+              <th className="px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-900 last:border-r-0 text-center">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-blue-900">
             {sortedUsers.map((user, index) => (
               <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                 <td className={tdClass}>{index + 1}</td>

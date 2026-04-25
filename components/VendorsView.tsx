@@ -42,8 +42,8 @@ export const VendorsView: React.FC<VendorsViewProps> = ({ vendors, onAddVendor, 
     return filteredVendors.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredVendors, currentPage]);
 
-  const thClass = "px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider border-r border-indigo-500 last:border-r-0";
-  const tdClass = "px-6 py-4 text-sm text-gray-900 border-r border-gray-200 last:border-r-0";
+  const thClass = "px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-900 last:border-r-0";
+  const tdClass = "px-6 py-4 text-sm text-gray-900 border-r border-blue-900 last:border-r-0";
 
   const startEntry = filteredVendors.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
   const endEntry = Math.min(currentPage * itemsPerPage, filteredVendors.length);
@@ -110,7 +110,7 @@ export const VendorsView: React.FC<VendorsViewProps> = ({ vendors, onAddVendor, 
                 <th className={`${thClass} text-center`}>Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-blue-900">
               {paginatedVendors.map((item, index) => (
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                   <td className={tdClass}>{(currentPage - 1) * itemsPerPage + index + 1}</td>

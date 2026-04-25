@@ -4,7 +4,7 @@ import { TaskTable } from './TaskTable';
 import { EditTaskModal } from './EditTaskModal';
 import { BulkUpdateModal } from './BulkUpdateModal';
 import { SearchableSelect } from './SearchableSelect';
-import { Task, User, Category, Client, Firm, ActionLogEntry, TaskTemplate } from '../types'; 
+import { Task, User, Category, Client, Firm, ActionLogEntry, TaskTemplate, StatusOption } from '../types'; 
 import { parseToISO, parseToTimestamp, formatToIndianDateTime } from '../App';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -16,10 +16,11 @@ interface TasksViewProps {
   tasks: Task[];
   users: User[];
   categories: Category[];
+  statuses: StatusOption[];
   clients: Client[]; 
   firms: Firm[]; 
   actionLogs: ActionLogEntry[]; 
-  onOpenUpdateModal: (task: Task) => void;
+  onOpenUpdateModal: (task: Task, mode?: 'status' | 'billing') => void;
   onEditTask: (task: Task) => void;
   onBulkUpdateTask: (ids: (string | number)[], updates: Partial<Task>) => void;
   onDeleteTask: (id: string | number) => void;
@@ -56,7 +57,7 @@ interface TasksViewProps {
 }
 
 export const TasksView: React.FC<TasksViewProps> = ({ 
-  title, description, onAddTask, tasks, users, categories, clients, firms, actionLogs, onOpenUpdateModal, onEditTask, onBulkUpdateTask, onDeleteTask, onExportExcel, onViewHistory, filterType = 'all', onAddCategory, onAddClient, onAddFirm, syncingIds = new Set(), currentUser, taskTemplates, filterStatus, setFilterStatus, filterPriority, setFilterPriority, filterClient, setFilterClient, filterOwner, setFilterOwner, filterAssignee, setFilterAssignee, dateFrom, setDateFrom, dateTo, setDateTo, lastUpdateFrom, setLastUpdateFrom, lastUpdateTo, setLastUpdateTo, searchTerm, setSearchTerm, hideCreationInfo = false
+  title, description, onAddTask, tasks, users, categories, statuses, clients, firms, actionLogs, onOpenUpdateModal, onEditTask, onBulkUpdateTask, onDeleteTask, onExportExcel, onViewHistory, filterType = 'all', onAddCategory, onAddClient, onAddFirm, syncingIds = new Set(), currentUser, taskTemplates, filterStatus, setFilterStatus, filterPriority, setFilterPriority, filterClient, setFilterClient, filterOwner, setFilterOwner, filterAssignee, setFilterAssignee, dateFrom, setDateFrom, dateTo, setDateTo, lastUpdateFrom, setLastUpdateFrom, lastUpdateTo, setLastUpdateTo, searchTerm, setSearchTerm, hideCreationInfo = false
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isBulkUpdateModalOpen, setIsBulkUpdateModalOpen] = useState(false);
@@ -78,6 +79,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
     return tasks.filter(task => {
       if (filterType === 'pending' && task.status === 'Completed') return false;
       if (filterType === 'completed' && task.status !== 'Completed') return false;
+      if (filterType === 'pending-billing' && !(task.status === 'Completed' && String(task.billable || '').toLowerCase() === 'yes' && !String(task.billingStatus || '').trim())) return false;
       
       if (searchTerm) {
         const lowerTerm = searchTerm.toLowerCase();
@@ -147,7 +149,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
   };
 
   const handleBulkUpdate = (updates: Partial<Task>) => {
-    onBulkUpdateTask(selectedIds, updates);
+    onBulkUpdateTask(
+      selectedIds,
+      filterType === 'pending-billing' ? { ...updates, skipMessage: true as any } : updates
+    );
     setSelectedIds([]);
   };
 
@@ -163,7 +168,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
   };
 
   const exportToExcel = () => {
-    const headers = ["S.No.", "Created At", "Created By", "Task", "Client", "Client Mobile", "Due Date", "Assignee", "Status", "Last Updated", "Remarks"];
+    const headers = ["S.No.", "Created At", "Created By", "Task", "Category", "Client", "Client Mobile", "Due Date", "Assignee", "Status", "Last Updated", "Remarks", "Billable", "Billing Status"];
     const csvRows = [headers.join(",")];
     
     filteredTasks.forEach((task, index) => {
@@ -172,13 +177,16 @@ export const TasksView: React.FC<TasksViewProps> = ({
         `"${task.date}"`,
         `"${task.createdBy}"`,
         `"${task.title.replace(/"/g, '""')}"`,
+        `"${task.category || ''}"`,
         `"${task.clientName || ''}"`,
         `"${task.clientMobile || ''}"`,
         `"${task.dueDate || ''}"`,
         `"${task.assignee}"`,
         `"${task.status}"`,
         `"${task.lastUpdateDate}"`,
-        `"${(task.lastUpdateRemarks || "").replace(/"/g, '""')}"`
+        `"${(task.lastUpdateRemarks || "").replace(/"/g, '""')}"`,
+        `"${task.billable || ''}"`,
+        `"${task.billingStatus || ''}"`
       ];
       csvRows.push(row.join(","));
     });
@@ -201,19 +209,22 @@ export const TasksView: React.FC<TasksViewProps> = ({
     doc.setFontSize(10);
     doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 22);
 
-    const tableHeaders = [["S.No", "Created", "Created By", "Task", "Client", "Client Mobile", "Due Date", "Assignee", "Status", "Last Update", "Remarks"]];
+    const tableHeaders = [["S.No", "Created", "Created By", "Task", "Category", "Client", "Client Mobile", "Due Date", "Assignee", "Status", "Last Update", "Remarks", "Billable", "Billing Status"]];
     const tableData = filteredTasks.map((t, i) => [
       i + 1,
       t.date,
       t.createdBy,
       t.title,
+      t.category || '-',
       t.clientName || '-',
       t.clientMobile || '-',
       t.dueDate || '-',
       t.assignee,
       t.status,
       t.lastUpdateDate,
-      t.lastUpdateRemarks || "-"
+      t.lastUpdateRemarks || "-",
+      t.billable || "-",
+      t.billingStatus || "-"
     ]);
 
     autoTable(doc, {
@@ -302,9 +313,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
               <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Status</label>
               <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm">
                 <option>All Status</option>
-                <option>Not Yet Started</option>
-                <option>In Progress</option>
-                <option>Completed</option>
+                {statuses.map(status => <option key={status.id} value={status.name}>{status.name}</option>)}
               </select>
             </div>
             <div>
@@ -335,7 +344,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
       <TaskTable 
         tasks={paginatedTasks} 
-        onUpdateTask={onOpenUpdateModal}
+        onUpdateTask={(task) => onOpenUpdateModal(task, filterType === 'pending-billing' ? 'billing' : 'status')}
         onEditTask={handleEditTaskClick}
         onDeleteTask={onDeleteTask}
         selectedIds={selectedIds}
@@ -350,6 +359,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
         startIndex={(currentPage - 1) * itemsPerPage + 1}
         showSelection={true}
         hideCreationInfo={false}
+        isBillingView={filterType === 'pending-billing'}
       />
       
       {totalPages > 1 && (
@@ -361,7 +371,15 @@ export const TasksView: React.FC<TasksViewProps> = ({
       )}
 
       <EditTaskModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} task={selectedTask} onSave={onEditTask} onAddCategory={onAddCategory} onAddClient={onAddClient} onAddFirm={onAddFirm} users={users} categories={categories} clients={clients} firms={firms} taskTemplates={taskTemplates} />
-      <BulkUpdateModal isOpen={isBulkUpdateModalOpen} onClose={() => setIsBulkUpdateModalOpen(false)} count={selectedIds.length} onUpdate={handleBulkUpdate} users={users} mode="status" />
+      <BulkUpdateModal
+        isOpen={isBulkUpdateModalOpen}
+        onClose={() => setIsBulkUpdateModalOpen(false)}
+        count={selectedIds.length}
+        onUpdate={handleBulkUpdate}
+        users={users}
+        statuses={statuses}
+        mode={filterType === 'pending-billing' ? 'billing' : 'status'}
+      />
     </div>
   );
 };

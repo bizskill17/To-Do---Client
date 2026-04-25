@@ -20,6 +20,7 @@ interface TaskTableProps {
   onSort: (key: keyof Task, dir: 'asc' | 'desc') => void;
   startIndex: number;
   hideCreationInfo?: boolean;
+  isBillingView?: boolean;
 }
 
 export const TaskTable: React.FC<TaskTableProps> = ({ 
@@ -36,7 +37,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({
   onSort,
   startIndex,
   hideCreationInfo = false,
-  currentUser
+  currentUser,
+  isBillingView = false
 }) => {
 
   const requestSort = (key: keyof Task) => {
@@ -99,6 +101,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                 <th className={`${thClass} min-w-[120px]`} onClick={() => requestSort('date')}><div className="flex items-center">Create Date/Time {getSortIcon('date')}</div></th>
                 <th className={`${thClass} min-w-[90px]`} onClick={() => requestSort('createdBy')}><div className="flex items-center">Created By {getSortIcon('createdBy')}</div></th>
                 <th className={`${thClass} min-w-[300px]`} onClick={() => requestSort('title')}><div className="flex items-center">Task {getSortIcon('title')}</div></th>
+                <th className={`${thClass} min-w-[120px]`} onClick={() => requestSort('category')}><div className="flex items-center">Category {getSortIcon('category')}</div></th>
                 <th className={`${thClass} min-w-[220px]`} onClick={() => requestSort('clientName')}><div className="flex items-center">Client {getSortIcon('clientName')}</div></th>
                 <th className={`${thClass} min-w-[90px]`} onClick={() => requestSort('clientMobile')}><div className="flex items-center">Client Mobile {getSortIcon('clientMobile')}</div></th>
                 <th className={`${thClass} min-w-[80px]`} onClick={() => requestSort('dueDate')}><div className="flex items-center">Due Date {getSortIcon('dueDate')}</div></th>
@@ -106,6 +109,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                 <th className={thClass} onClick={() => requestSort('status')}><div className="flex items-center">Status {getSortIcon('status')}</div></th>
                 <th className={`${thClass} min-w-[120px]`} onClick={() => requestSort('lastUpdateDate')}><div className="flex items-center">Last Updated {getSortIcon('lastUpdateDate')}</div></th>
                 <th className={`${thClass} min-w-[110px]`} onClick={() => requestSort('lastUpdateRemarks')}><div className="flex items-center">Remarks {getSortIcon('lastUpdateRemarks')}</div></th>
+                <th className={`${thClass} min-w-[80px]`} onClick={() => requestSort('billable')}><div className="flex items-center">Billable {getSortIcon('billable')}</div></th>
+                <th className={`${thClass} min-w-[100px]`} onClick={() => requestSort('billingStatus')}><div className="flex items-center">Billing Status {getSortIcon('billingStatus')}</div></th>
                 <th className="px-3 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-900 last:border-r-0 text-center min-w-[90px]">Actions</th>
               </tr>
             </thead>
@@ -132,6 +137,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                     <td className={`${tdClass} whitespace-nowrap`}>{formatToIndianDateTime(task.date)}</td>
                     <td className={tdClass}>{task.createdBy}</td>
                     <td className={`${tdClass} font-medium`}>{task.title}</td>
+                    <td className={tdClass}>{task.category || '-'}</td>
                     <td className={tdClass}>{task.clientName || '-'}</td>
                     <td className={tdClass}>{task.clientMobile || '-'}</td>
                     <td className={`${tdClass} whitespace-nowrap`}>{task.dueDate || '-'}</td>
@@ -139,9 +145,11 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                     <td className={tdClass}><span className={`text-[10px] font-bold uppercase tracking-wider ${getStatusColor(task.status)}`}>{task.status}</span></td>
                     <td className={`${tdClass} whitespace-nowrap`}>{formatToIndianDateTime(task.lastUpdateDate)}</td>
                     <td className={tdClass}>{task.lastUpdateRemarks || '-'}</td>
+                    <td className={tdClass}>{task.billable || '-'}</td>
+                    <td className={tdClass}>{task.billingStatus || '-'}</td>
 	                    <td className={tdClass}>
 	                      <div className="flex items-center space-x-2 justify-center">
-	                        <button onClick={() => onUpdateTask(task)} onDoubleClick={(e) => e.stopPropagation()} disabled={isSyncing} className="px-2 py-1 bg-blue-600 rounded text-xs font-medium text-white hover:bg-blue-700">Update</button>
+	                        <button onClick={() => onUpdateTask(task)} onDoubleClick={(e) => e.stopPropagation()} disabled={isSyncing} className="px-2 py-1 bg-blue-600 rounded text-xs font-medium text-white hover:bg-blue-700">{isBillingView ? 'Billing' : 'Update'}</button>
 	                        {/* Edit and Delete icons restricted based on Screenshot 1: only Admin or task creator */}
 	                        {hasModificationRights && (
 	                          <>
@@ -173,9 +181,12 @@ export const TaskTable: React.FC<TaskTableProps> = ({
               </div>
               <h3 className="font-bold text-gray-900 mb-2">{task.title}</h3>
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-3">
+                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Category</span>{task.category || '-'}</div>
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Client</span>{task.clientName || '-'}</div>
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Client Mobile</span>{task.clientMobile || '-'}</div>
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Due Date</span>{task.dueDate || '-'}</div>
+                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Billable</span>{task.billable || '-'}</div>
+                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Billing Status</span>{task.billingStatus || '-'}</div>
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Assignee</span>{task.assignee}</div>
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Created By</span>{task.createdBy}</div>
                 <div className="col-span-2"><span className="font-bold block uppercase text-[10px] text-gray-400">Created At</span>{formatToIndianDateTime(task.date)}</div>
@@ -187,7 +198,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
 	                    <button onClick={() => onEditTask(task)} onDoubleClick={(e) => e.stopPropagation()} className="p-2 text-blue-600 bg-blue-50 rounded"><Edit2 size={18} /></button>
 	                  </>
 	                )}
-	                <button onClick={() => onUpdateTask(task)} onDoubleClick={(e) => e.stopPropagation()} className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded uppercase">Update</button>
+	                <button onClick={() => onUpdateTask(task)} onDoubleClick={(e) => e.stopPropagation()} className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded uppercase">{isBillingView ? 'Billing' : 'Update'}</button>
 	              </div>
 	            </div>
 	          );

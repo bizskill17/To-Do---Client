@@ -32,8 +32,7 @@ export interface Task {
   clientId?: string | number;
   clientName?: string;
   clientMobile?: string;
-  /* Added missing status values to match application logic and fix comparison errors */
-  status: 'Not Yet Started' | 'In Progress' | 'Completed' | 'Pending Billing' | 'Pending for Partner' | 'Pending for Leader' | 'Pending for Member' | 'Pending For Team Leader';
+  status: string;
   date: string; // Create Date/Time
   createdBy: string;
   lastUpdateDate: string; // Last Updated
@@ -50,6 +49,8 @@ export interface Task {
   owner?: string;
   assignees?: string;
   category?: string;
+  billable?: string;
+  billingStatus?: string;
   priority?: string;
   teamMembers?: string;
   skipLog?: boolean;
@@ -72,7 +73,12 @@ export interface User {
 }
 
 export interface Category {
-    id: number;
+    id: string | number;
+    name: string;
+}
+
+export interface StatusOption {
+    id: string | number;
     name: string;
 }
 

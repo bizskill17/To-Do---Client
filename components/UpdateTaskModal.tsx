@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { X, AlertTriangle, Clock, DollarSign, UserRoundMinus } from 'lucide-react'; 
-import { Task, User, Client, ActionLogEntry, Firm } from '../types'; 
+import { Task, User, Client, ActionLogEntry, Firm, StatusOption } from '../types'; 
 import { SearchableSelect } from './SearchableSelect';
 
 interface UpdateTaskModalProps {
@@ -9,13 +9,15 @@ interface UpdateTaskModalProps {
   task: Task | null;
   onUpdate: (task: Task) => void;
   users: User[];
+  mode?: 'status' | 'billing';
+  statuses?: StatusOption[];
   clients?: Client[]; 
   firms?: Firm[]; 
   actionLogs?: ActionLogEntry[]; 
   currentUser?: User | null; 
 }
 
-export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClose, task, onUpdate, users, clients = [], firms = [], actionLogs = [], currentUser }) => {
+export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClose, task, onUpdate, users, mode = 'status', statuses = [], clients = [], firms = [], actionLogs = [], currentUser }) => {
   const [formData, setFormData] = useState<Partial<Task>>({});
   const [remarksInput, setRemarksInput] = useState<string>('');
   const [billingRateInput, setBillingRateInput] = useState<string>(''); 
@@ -24,24 +26,23 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
   const [isConfirming, setIsConfirming] = useState(false);
 
   const getUserSpecificStatusOptions = () => {
-    return [
-      'In Progress',
-      'Completed'
-    ];
+    const sheetStatuses = statuses.map(s => s.name).filter(Boolean);
+    return sheetStatuses.length > 0 ? sheetStatuses : ['In Progress', 'Completed'];
   };
 
   // Initialize form when task changes
   useEffect(() => {
     if (task && isOpen) {
-      const options = getUserSpecificStatusOptions();
+      const options = mode === 'billing' ? ['Done'] : getUserSpecificStatusOptions();
       
-      let initialStatus = task.status;
-      if (!options.includes(task.status as any)) {
-          initialStatus = options[0] as any;
+      let initialStatus = mode === 'billing' ? String(task.billingStatus || '') : task.status;
+      if (!options.includes(initialStatus as any)) {
+          initialStatus = mode === 'billing' ? '' : options[0] as any;
       }
 
       setFormData({
-        status: initialStatus as any,
+        status: mode === 'billing' ? task.status : initialStatus as any,
+        billingStatus: mode === 'billing' ? initialStatus : task.billingStatus,
       });
       
       setRemarksInput('');
@@ -50,7 +51,7 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
       setError('');
       setIsConfirming(false);
     }
-  }, [task, isOpen, currentUser]);
+  }, [task, isOpen, currentUser, mode]);
 
   // Effect to set default billing rate/firm when status changes to 'Completed'
   useEffect(() => {
@@ -89,6 +90,15 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
 
   const handlePreSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (mode === 'billing') {
+      if (!String(formData.billingStatus || '').trim()) {
+        setError('Please select billing status.');
+        return;
+      }
+      setIsConfirming(true);
+      return;
+    }
     
     // Validate remarks
     if (!remarksInput || remarksInput.trim() === '') {
@@ -124,7 +134,8 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
 
     const updatedTask: Task = { 
         ...task, 
-        status: formData.status as any,
+        status: mode === 'billing' ? task.status : formData.status as any,
+        billingStatus: mode === 'billing' ? String(formData.billingStatus || 'Done') : task.billingStatus,
         lastUpdateRemarks: remarksInput, 
         lastUpdateDate: timestamp, // Crucial for immediate local feedback (Screenshot 4)
         hoursTaken: task.hoursTaken || 0,
@@ -136,7 +147,7 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
     onClose();
   };
 
-  const options = getUserSpecificStatusOptions();
+  const options = mode === 'billing' ? ['Done'] : getUserSpecificStatusOptions();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-opacity">
@@ -144,7 +155,7 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
         
 	        <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
 	          <div className="flex flex-col">
-	            <h2 className="text-xl font-bold text-indigo-600">{isConfirming ? 'Confirm Update' : 'Update Status'}</h2>
+	            <h2 className="text-xl font-bold text-indigo-600">{isConfirming ? 'Confirm Update' : mode === 'billing' ? 'Update Billing Status' : 'Update Status'}</h2>
 	            <div className="text-xs font-bold text-gray-500 mt-1">({task.title})</div>
 	          </div>
 	          <button 
@@ -179,6 +190,21 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
                 </div>
               )}
 
+              {mode === 'billing' ? (
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-900 block mb-1">Billing Status <span className="text-red-500">*</span></label>
+                  <select
+                    name="billingStatus"
+                    required
+                    value={String(formData.billingStatus || '')}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
+                  >
+                    <option value="">Select Billing Status...</option>
+                    <option value="Done">Done</option>
+                  </select>
+                </div>
+              ) : (
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-900 block mb-1">Status <span className="text-red-500">*</span></label>
                 <select 
@@ -193,7 +219,9 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
                     ))}
                   </select>
               </div>
+              )}
 
+              {mode !== 'billing' && (
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-900 block mb-1">
                   Update Remark <span className="text-red-500">*</span>
@@ -207,8 +235,9 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
                   className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none text-gray-900 resize-none"
                 ></textarea>
               </div>
+              )}
 
-              {formData.status === 'Completed' && task.billingApplicable && (
+              {mode !== 'billing' && formData.status === 'Completed' && task.billingApplicable && (
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-blue-100">
                         <div className="space-y-1">
