@@ -221,7 +221,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
       body: tableData,
       startY: 28,
       styles: { fontSize: 8 },
-      headStyles: { fillColor: [67, 56, 202] }
+      headStyles: { fillColor: [67, 56, 202], lineColor: [30, 58, 138], lineWidth: 0.2 },
+      bodyStyles: { lineColor: [30, 58, 138], lineWidth: 0.2 },
+      tableLineColor: [30, 58, 138],
+      tableLineWidth: 0.2
     });
 
     doc.save(`Tasks_${new Date().toISOString().split('T')[0]}.pdf`);
