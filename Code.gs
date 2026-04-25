@@ -12,7 +12,7 @@ const SHEETS = {
   RECURRING: 'RecurringTasks',
   REC_ACTIONS: 'RecurringActions',
   USERS: 'Users', // Updated from 'Assignees' to 'Users'
-  CLIENTS: 'Clients',
+  CLIENTS: 'Client',
   FIRMS: 'Firms',
   CATEGORIES: 'Categories',
   TEMPLATES: 'TaskTemplates',
@@ -86,7 +86,33 @@ function buildNewTaskMessage(taskTitle, createdBy, assigneeName, createdAt) {
   ].filter(Boolean).join("\n");
 }
 
-function buildUpdateTaskMessage(taskTitle, status, remarks, updatedAt) {
+function formatAnyDateToIndian(dateValue) {
+  if (!dateValue) return '';
+  if (Object.prototype.toString.call(dateValue) === '[object Date]' && !isNaN(dateValue.getTime())) {
+    return Utilities.formatDate(dateValue, Session.getScriptTimeZone(), "dd/MM/yyyy");
+  }
+  const str = String(dateValue).trim();
+  if (!str) return '';
+  const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) return isoMatch[3] + "/" + isoMatch[2] + "/" + isoMatch[1];
+  const dmyMatch = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+  if (dmyMatch) return ("0" + dmyMatch[1]).slice(-2) + "/" + ("0" + dmyMatch[2]).slice(-2) + "/" + dmyMatch[3];
+  return str;
+}
+
+function buildTaskSummaryMessage(taskTitle, createdBy, assigneeName, createdAt, clientName, dueDate) {
+  return [
+    "*NEW TASK ASSIGNED*",
+    taskTitle ? `Task: ${taskTitle}` : null,
+    assigneeName ? `Assignee: ${assigneeName}` : null,
+    clientName ? `Client: ${clientName}` : null,
+    dueDate ? `Due Date: ${formatAnyDateToIndian(dueDate)}` : null,
+    createdBy ? `Created By: ${createdBy}` : null,
+    createdAt ? `Created At: ${Utilities.formatDate(createdAt, Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm")}` : null
+  ].filter(Boolean).join("\n");
+}
+
+function buildUpdateTaskMessage(taskTitle, clientName, status, remarks, updatedAt) {
   const updatedAtStr = updatedAt
     ? Utilities.formatDate(updatedAt, Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm")
     : '';
@@ -94,6 +120,7 @@ function buildUpdateTaskMessage(taskTitle, status, remarks, updatedAt) {
   return [
     "*TASK UPDATED*",
     taskTitle ? `Task: ${taskTitle}` : null,
+    clientName ? `Client: ${clientName}` : null,
     status ? `Status: ${status}` : null,
     remarks ? `Remarks: ${remarks}` : null,
     updatedAtStr ? `Updated At: ${updatedAtStr}` : null
@@ -262,7 +289,9 @@ function handleAddTask(data) {
       normalizeTo10Digits(normalizedData.assigneenumber) ||
       getUserMobileByAssignee(assigneeName || normalizedData.assigneeid);
     const ownerNumber = getMessageSettingsRow().ownerNumber;
-    const msg = buildNewTaskMessage(taskTitle, createdBy, assigneeName, createdAt);
+    const clientName = String(normalizedData.clientname || '');
+    const dueDate = normalizedData.duedate || '';
+    const msg = buildTaskSummaryMessage(taskTitle, createdBy, assigneeName, createdAt, clientName, dueDate);
     Logger.log("Assign recipients. Assignee: " + assigneeMobile + " Owner: " + ownerNumber);
     if (assigneeMobile) sendWhatsAppMessage(assigneeMobile, msg);
     if (ownerNumber) sendWhatsAppMessage(ownerNumber, msg);
@@ -301,14 +330,20 @@ function handleUpdateTask(data) {
   try {
     const status = String(data.status || '');
     const remarks = String(data.lastupdateremarks || data.remarks || '');
+    const normalizedHeaders = headers.map(x => String(x || '').trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
     const taskTitleCell = (() => {
-      const idx = headers.map(x => String(x || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '')).indexOf('task');
+      const idx = normalizedHeaders.indexOf('task');
+      if (idx === -1) return '';
+      return String(sheet.getRange(rowIndex, idx + 1).getValue() || '');
+    })();
+    const clientNameCell = (() => {
+      const idx = normalizedHeaders.indexOf('clientname');
       if (idx === -1) return '';
       return String(sheet.getRange(rowIndex, idx + 1).getValue() || '');
     })();
 
     const ownerNumber = getMessageSettingsRow().ownerNumber;
-    const msg = buildUpdateTaskMessage(taskTitleCell, status, remarks, updatedAt);
+    const msg = buildUpdateTaskMessage(taskTitleCell, clientNameCell, status, remarks, updatedAt);
     sendWhatsAppMessage(ownerNumber, msg);
   } catch (e) {
     Logger.log("UpdateTask message send failed: " + e);
@@ -323,9 +358,14 @@ function handleAddMaster(target, data) {
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const rowData = headers.map(h => {
     const hLower = h.toString().trim().toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (hLower === 'id') return id;
+    if (hLower === 'id' || hLower.endsWith('id')) return id;
     const key = Object.keys(data).find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === hLower);
-    return key ? data[key] : "";
+    if (key) return data[key];
+    if (target === SHEETS.CLIENTS) {
+      if (hLower === 'clientname') return data.name || data.clientname || '';
+      if (hLower === 'clientmobilenumber') return data.mobile || data.clientmobilenumber || '';
+    }
+    return "";
   });
   sheet.appendRow(rowData);
   return { id: id };
@@ -344,8 +384,16 @@ function handleUpdateMaster(target, data) {
   headers.forEach((h, i) => {
     const hLower = h.toString().trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     const key = Object.keys(data).find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === hLower);
-    if (key && hLower !== 'id') {
+    if (key && hLower !== 'id' && !hLower.endsWith('id')) {
       sheet.getRange(rowIndex, i + 1).setValue(data[key]);
+      return;
+    }
+    if (target === SHEETS.CLIENTS) {
+      if (hLower === 'clientname' && data.name !== undefined) {
+        sheet.getRange(rowIndex, i + 1).setValue(data.name);
+      } else if (hLower === 'clientmobilenumber' && data.mobile !== undefined) {
+        sheet.getRange(rowIndex, i + 1).setValue(data.mobile);
+      }
     }
   });
   return true;

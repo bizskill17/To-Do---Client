@@ -1,0 +1,606 @@
+2026-04-25T04:32:20.085Z vite:config config file loaded in 1338.48ms
+2026-04-25T04:32:20.091Z vite:env loading env files: [
+  'D:/To-Do - Clientwise/.env',
+  'D:/To-Do - Clientwise/.env.local',
+  'D:/To-Do - Clientwise/.env.development',
+  'D:/To-Do - Clientwise/.env.development.local'
+]
+2026-04-25T04:32:20.091Z vite:env env files loaded in 0.95ms
+2026-04-25T04:32:20.092Z vite:env using resolved env: {}
+2026-04-25T04:32:20.105Z vite:config using resolved config: {
+  plugins: [
+    'vite:optimized-deps',
+    'vite:watch-package-data',
+    'vite:pre-alias',
+    'alias',
+    'vite:react-babel',
+    'vite:react-refresh',
+    'vite:modulepreload-polyfill',
+    'vite:resolve',
+    'vite:html-inline-proxy',
+    'vite:css',
+    'vite:esbuild',
+    'vite:json',
+    'vite:wasm-helper',
+    'vite:worker',
+    'vite:asset',
+    'vite:wasm-fallback',
+    'vite:define',
+    'vite:css-post',
+    'vite:worker-import-meta-url',
+    'vite:asset-import-meta-url',
+    'vite:dynamic-import-vars',
+    'vite:import-glob',
+    'vite:client-inject',
+    'vite:css-analysis',
+    'vite:import-analysis'
+  ],
+  server: {
+    port: 5173,
+    strictPort: false,
+    host: '127.0.0.1',
+    allowedHosts: [],
+    https: undefined,
+    open: false,
+    proxy: undefined,
+    cors: {
+      origin: /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/
+    },
+    headers: {},
+    warmup: { clientFiles: [], ssrFiles: [] },
+    middlewareMode: false,
+    fs: {
+      strict: true,
+      deny: [ '.env', '.env.*', '*.{crt,pem}', '**/.git/**' ],
+      allow: [ 'D:/To-Do - Clientwise' ]
+    },
+    preTransformRequests: true,
+    perEnvironmentStartEndDuringDev: false,
+    sourcemapIgnoreList: [Function: isInNodeModules$1]
+  },
+  esbuild: { jsxDev: true, jsx: 'automatic', jsxImportSource: undefined },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react/jsx-dev-runtime',
+      'react/jsx-runtime'
+    ],
+    exclude: [],
+    needsInterop: [],
+    extensions: [],
+    disabled: undefined,
+    holdUntilCrawlEnd: true,
+    force: false,
+    noDiscovery: false,
+    esbuildOptions: { preserveSymlinks: false, jsx: 'automatic' }
+  },
+  build: {
+    target: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+    polyfillModulePreload: true,
+    modulePreload: { polyfill: true },
+    outDir: 'dist',
+    assetsDir: 'assets',
+    assetsInlineLimit: 4096,
+    sourcemap: false,
+    terserOptions: {},
+    rollupOptions: { onwarn: [Function: onwarn] },
+    commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+    dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+    write: true,
+    emptyOutDir: null,
+    copyPublicDir: true,
+    manifest: false,
+    lib: false,
+    ssrManifest: false,
+    ssrEmitAssets: false,
+    reportCompressedSize: true,
+    chunkSizeWarningLimit: 500,
+    watch: null,
+    cssCodeSplit: true,
+    minify: 'esbuild',
+    ssr: false,
+    emitAssets: false,
+    createEnvironment: [Function: createEnvironment],
+    cssTarget: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+    cssMinify: true
+  },
+  resolve: {
+    externalConditions: [ 'node' ],
+    extensions: [
+      '.mjs',  '.js',
+      '.mts',  '.ts',
+      '.jsx',  '.tsx',
+      '.json'
+    ],
+    dedupe: [ 'react', 'react-dom' ],
+    noExternal: [],
+    external: [],
+    preserveSymlinks: false,
+    alias: [
+      {
+        find: /^\/?@vite\/env/,
+        replacement: '/@fs/D:/To-Do - Clientwise/node_modules/vite/dist/client/env.mjs'
+      },
+      {
+        find: /^\/?@vite\/client/,
+        replacement: '/@fs/D:/To-Do - Clientwise/node_modules/vite/dist/client/client.mjs'
+      }
+    ],
+    mainFields: [ 'browser', 'module', 'jsnext:main', 'jsnext' ],
+    conditions: [ 'module', 'browser', 'development|production' ],
+    builtins: []
+  },
+  environments: {
+    client: {
+      define: undefined,
+      resolve: {
+        externalConditions: [ 'node' ],
+        extensions: [
+          '.mjs',  '.js',
+          '.mts',  '.ts',
+          '.jsx',  '.tsx',
+          '.json'
+        ],
+        dedupe: [ 'react', 'react-dom' ],
+        noExternal: [],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/D:/To-Do - Clientwise/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/D:/To-Do - Clientwise/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'browser', 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'browser', 'development|production' ],
+        builtins: []
+      },
+      keepProcessEnv: false,
+      consumer: 'client',
+      optimizeDeps: {
+        include: [
+          'react',
+          'react-dom',
+          'react/jsx-dev-runtime',
+          'react/jsx-runtime'
+        ],
+        exclude: [],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        noDiscovery: false,
+        esbuildOptions: { preserveSymlinks: false, jsx: 'automatic' }
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules$1],
+        preTransformRequests: true,
+        createEnvironment: [Function: defaultCreateClientDevEnvironment],
+        recoverable: true,
+        moduleRunnerTransform: false
+      },
+      build: {
+        target: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: 'dist',
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: { onwarn: [Function: onwarn] },
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: true,
+        manifest: false,
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: false,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: 'esbuild',
+        ssr: false,
+        emitAssets: true,
+        createEnvironment: [Function: createEnvironment],
+        cssTarget: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+        cssMinify: true
+      }
+    },
+    ssr: {
+      define: undefined,
+      resolve: {
+        externalConditions: [ 'node' ],
+        extensions: [
+          '.mjs',  '.js',
+          '.mts',  '.ts',
+          '.jsx',  '.tsx',
+          '.json'
+        ],
+        dedupe: [ 'react', 'react-dom' ],
+        noExternal: [],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/D:/To-Do - Clientwise/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/D:/To-Do - Clientwise/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'node', 'development|production' ],
+        builtins: [
+          '_http_agent',         '_http_client',        '_http_common',
+          '_http_incoming',      '_http_outgoing',      '_http_server',
+          '_stream_duplex',      '_stream_passthrough', '_stream_readable',
+          '_stream_transform',   '_stream_wrap',        '_stream_writable',
+          '_tls_common',         '_tls_wrap',           'assert',
+          'assert/strict',       'async_hooks',         'buffer',
+          'child_process',       'cluster',             'console',
+          'constants',           'crypto',              'dgram',
+          'diagnostics_channel', 'dns',                 'dns/promises',
+          'domain',              'events',              'fs',
+          'fs/promises',         'http',                'http2',
+          'https',               'inspector',           'inspector/promises',
+          'module',              'net',                 'os',
+          'path',                'path/posix',          'path/win32',
+          'perf_hooks',          'process',             'punycode',
+          'querystring',         'readline',            'readline/promises',
+          'repl',                'stream',              'stream/consumers',
+          'stream/promises',     'stream/web',          'string_decoder',
+          'sys',                 'timers',              'timers/promises',
+          'tls',                 'trace_events',        'tty',
+          'url',                 'util',                'util/types',
+          'v8',                  'vm',                  'wasi',
+          'worker_threads',      'zlib',                /^node:/,
+          /^npm:/,               /^bun:/
+        ]
+      },
+      keepProcessEnv: true,
+      consumer: 'server',
+      optimizeDeps: {
+        include: [],
+        exclude: [],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        noDiscovery: true,
+        esbuildOptions: { preserveSymlinks: false }
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules$1],
+        preTransformRequests: false,
+        createEnvironment: [Function: defaultCreateDevEnvironment],
+        recoverable: false,
+        moduleRunnerTransform: true
+      },
+      build: {
+        target: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: 'dist',
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: { onwarn: [Function: onwarn] },
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: true,
+        manifest: false,
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: false,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: false,
+        ssr: true,
+        emitAssets: false,
+        createEnvironment: [Function: createEnvironment],
+        cssTarget: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+        cssMinify: 'esbuild'
+      }
+    }
+  },
+  configFile: 'D:/To-Do - Clientwise/vite.config.ts',
+  configFileDependencies: [ 'D:/To-Do - Clientwise/vite.config.ts' ],
+  inlineConfig: {
+    root: undefined,
+    base: undefined,
+    mode: undefined,
+    configFile: undefined,
+    configLoader: undefined,
+    logLevel: undefined,
+    clearScreen: undefined,
+    server: { host: '127.0.0.1' },
+    forceOptimizeDeps: undefined
+  },
+  root: 'D:/To-Do - Clientwise',
+  base: '/',
+  decodedBase: '/',
+  rawBase: '/',
+  publicDir: 'D:/To-Do - Clientwise/public',
+  cacheDir: 'D:/To-Do - Clientwise/node_modules/.vite',
+  command: 'serve',
+  mode: 'development',
+  isWorker: false,
+  mainConfig: null,
+  bundleChain: [],
+  isProduction: false,
+  css: {
+    transformer: 'postcss',
+    preprocessorMaxWorkers: 0,
+    devSourcemap: false
+  },
+  json: { namedExports: true, stringify: 'auto' },
+  builder: undefined,
+  preview: {
+    port: 4173,
+    strictPort: false,
+    host: '127.0.0.1',
+    allowedHosts: [],
+    https: undefined,
+    open: false,
+    proxy: undefined,
+    cors: {
+      origin: /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/
+    },
+    headers: {}
+  },
+  envDir: 'D:/To-Do - Clientwise',
+  env: { BASE_URL: '/', MODE: 'development', DEV: true, PROD: false },
+  assetsInclude: [Function: assetsInclude],
+  logger: {
+    hasWarned: false,
+    info: [Function: info],
+    warn: [Function: warn],
+    warnOnce: [Function: warnOnce],
+    error: [Function: error],
+    clearScreen: [Function: clearScreen],
+    hasErrorLogged: [Function: hasErrorLogged]
+  },
+  packageCache: Map(1) {
+    'fnpd_D:/To-Do - Clientwise' => {
+      dir: 'D:/To-Do - Clientwise',
+      data: {
+        name: 'task-bizskill',
+        private: true,
+        version: '0.0.0',
+        type: 'module',
+        scripts: { dev: 'vite', build: 'vite build', preview: 'vite preview' },
+        dependencies: {
+          react: '19.0.0',
+          'react-dom': '19.0.0',
+          'lucide-react': '^0.460.0',
+          recharts: '^2.13.0',
+          jspdf: '^2.5.1',
+          'jspdf-autotable': '^3.8.2'
+        },
+        devDependencies: {
+          '@types/react': '^19.0.0',
+          '@types/react-dom': '^19.0.0',
+          '@vitejs/plugin-react': '^4.3.4',
+          typescript: '^5.0.0',
+          vite: '^6.0.0'
+        }
+      },
+      hasSideEffects: [Function: hasSideEffects],
+      setResolvedCache: [Function: setResolvedCache],
+      getResolvedCache: [Function: getResolvedCache]
+    },
+    set: [Function (anonymous)]
+  },
+  worker: { format: 'iife', plugins: '() => plugins', rollupOptions: {} },
+  appType: 'spa',
+  experimental: { importGlobRestoreExtension: false, hmrPartialAccept: false },
+  future: undefined,
+  ssr: {
+    target: 'node',
+    optimizeDeps: {
+      esbuildOptions: { preserveSymlinks: false },
+      include: [],
+      exclude: [],
+      needsInterop: [],
+      extensions: [],
+      holdUntilCrawlEnd: true,
+      force: false,
+      noDiscovery: true
+    },
+    external: [],
+    noExternal: [],
+    resolve: {
+      conditions: [ 'module', 'node', 'development|production' ],
+      externalConditions: [ 'node' ]
+    }
+  },
+  dev: {
+    warmup: [],
+    sourcemap: { js: true },
+    sourcemapIgnoreList: [Function: isInNodeModules$1],
+    preTransformRequests: false,
+    createEnvironment: [Function: defaultCreateDevEnvironment],
+    recoverable: false,
+    moduleRunnerTransform: false
+  },
+  webSocketToken: 'e4k4kUhMJjmE',
+  getSortedPlugins: [Function: getSortedPlugins],
+  getSortedPluginHooks: [Function: getSortedPluginHooks],
+  createResolver: [Function: createResolver],
+  fsDenyGlob: [Function: arrayMatcher],
+  safeModulePaths: Set(0) {},
+  additionalAllowedHosts: [ '127.0.0.1', '127.0.0.1' ],
+  Symbol(vite:resolved-config): true
+}
+2026-04-25T04:32:20.590Z vite:deps (client) Hash is consistent. Skipping. Use --force to override.
+
+  [32m[1mVITE[22m v6.4.2[39m  [2mready in [0m[1m2423[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+2026-04-25T04:37:18.659Z vite:hmr [file change] [2mApp.tsx[22m
+2026-04-25T04:37:18.660Z vite:hmr (client) [no modules matched] [2mApp.tsx[22m
+2026-04-25T04:37:18.660Z vite:hmr (ssr) [no modules matched] [2mApp.tsx[22m
+2026-04-25T04:37:26.561Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:37:26.561Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:37:26.561Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:37:34.989Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:37:34.989Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:37:34.989Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:42:25.955Z vite:hmr [file change] [2mtypes.ts[22m
+2026-04-25T04:42:25.955Z vite:hmr (client) [no modules matched] [2mtypes.ts[22m
+2026-04-25T04:42:25.955Z vite:hmr (ssr) [no modules matched] [2mtypes.ts[22m
+2026-04-25T04:42:31.025Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:42:31.025Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:42:31.025Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:43:07.923Z vite:hmr [file change] [2mcomponents/AddClientModal.tsx[22m
+2026-04-25T04:43:07.923Z vite:hmr (client) [no modules matched] [2mcomponents/AddClientModal.tsx[22m
+2026-04-25T04:43:07.923Z vite:hmr (ssr) [no modules matched] [2mcomponents/AddClientModal.tsx[22m
+2026-04-25T04:43:13.399Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:43:13.400Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:43:13.400Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:43:25.022Z vite:hmr [file change] [2mcomponents/EditClientModal.tsx[22m
+2026-04-25T04:43:25.022Z vite:hmr (client) [no modules matched] [2mcomponents/EditClientModal.tsx[22m
+2026-04-25T04:43:25.022Z vite:hmr (ssr) [no modules matched] [2mcomponents/EditClientModal.tsx[22m
+2026-04-25T04:43:32.036Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:43:32.036Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:43:32.036Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:44:09.311Z vite:hmr [file change] [2mcomponents/ClientsView.tsx[22m
+2026-04-25T04:44:09.311Z vite:hmr (client) [no modules matched] [2mcomponents/ClientsView.tsx[22m
+2026-04-25T04:44:09.311Z vite:hmr (ssr) [no modules matched] [2mcomponents/ClientsView.tsx[22m
+2026-04-25T04:44:14.754Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:44:14.755Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:44:14.755Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:44:35.329Z vite:hmr [file change] [2mApp.tsx[22m
+2026-04-25T04:44:35.329Z vite:hmr (client) [no modules matched] [2mApp.tsx[22m
+2026-04-25T04:44:35.329Z vite:hmr (ssr) [no modules matched] [2mApp.tsx[22m
+2026-04-25T04:44:40.523Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:44:40.523Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:44:40.523Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:44:55.547Z vite:hmr [file change] [2mCode.gs[22m
+2026-04-25T04:44:55.547Z vite:hmr (client) [no modules matched] [2mCode.gs[22m
+2026-04-25T04:44:55.547Z vite:hmr (ssr) [no modules matched] [2mCode.gs[22m
+2026-04-25T04:44:59.475Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:44:59.475Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:44:59.475Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:45:08.236Z vite:hmr [file change] [2mApp.tsx[22m
+2026-04-25T04:45:08.236Z vite:hmr (client) [no modules matched] [2mApp.tsx[22m
+2026-04-25T04:45:08.236Z vite:hmr (ssr) [no modules matched] [2mApp.tsx[22m
+2026-04-25T04:45:13.683Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:45:13.684Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T04:45:13.684Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:04:58.424Z vite:hmr [file change] [2mtypes.ts[22m
+2026-04-25T05:04:58.424Z vite:hmr (client) [no modules matched] [2mtypes.ts[22m
+2026-04-25T05:04:58.424Z vite:hmr (ssr) [no modules matched] [2mtypes.ts[22m
+2026-04-25T05:05:03.958Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:03.958Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:04.208Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:04.209Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:04.209Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:04.209Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:17.723Z vite:hmr [file change] [2mCode.gs[22m
+2026-04-25T05:05:17.724Z vite:hmr (client) [no modules matched] [2mCode.gs[22m
+2026-04-25T05:05:17.724Z vite:hmr (ssr) [no modules matched] [2mCode.gs[22m
+2026-04-25T05:05:23.007Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:23.007Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:23.007Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:42.040Z vite:hmr [file change] [2mApp.tsx[22m
+2026-04-25T05:05:42.041Z vite:hmr (client) [no modules matched] [2mApp.tsx[22m
+2026-04-25T05:05:42.041Z vite:hmr (ssr) [no modules matched] [2mApp.tsx[22m
+2026-04-25T05:05:46.037Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:46.037Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:05:46.038Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:06:00.577Z vite:hmr [file change] [2mcomponents/AddTaskModal.tsx[22m
+2026-04-25T05:06:00.577Z vite:hmr (client) [no modules matched] [2mcomponents/AddTaskModal.tsx[22m
+2026-04-25T05:06:00.577Z vite:hmr (ssr) [no modules matched] [2mcomponents/AddTaskModal.tsx[22m
+2026-04-25T05:06:10.091Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:06:10.091Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:06:10.091Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:06:24.409Z vite:hmr [file change] [2mcomponents/EditTaskModal.tsx[22m
+2026-04-25T05:06:24.409Z vite:hmr (client) [no modules matched] [2mcomponents/EditTaskModal.tsx[22m
+2026-04-25T05:06:24.409Z vite:hmr (ssr) [no modules matched] [2mcomponents/EditTaskModal.tsx[22m
+2026-04-25T05:06:29.127Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:06:29.127Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:06:29.127Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:06:41.665Z vite:hmr [file change] [2mcomponents/ClientsView.tsx[22m
+2026-04-25T05:06:41.665Z vite:hmr (client) [no modules matched] [2mcomponents/ClientsView.tsx[22m
+2026-04-25T05:06:41.665Z vite:hmr (ssr) [no modules matched] [2mcomponents/ClientsView.tsx[22m
+2026-04-25T05:06:45.867Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:06:45.867Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:06:45.868Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:07:09.466Z vite:hmr [file change] [2mcomponents/TasksView.tsx[22m
+2026-04-25T05:07:09.466Z vite:hmr (client) [no modules matched] [2mcomponents/TasksView.tsx[22m
+2026-04-25T05:07:09.466Z vite:hmr (ssr) [no modules matched] [2mcomponents/TasksView.tsx[22m
+2026-04-25T05:07:16.118Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:07:16.118Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:07:16.118Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:07:39.370Z vite:hmr [file change] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T05:07:39.531Z vite:hmr (client) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T05:07:39.531Z vite:hmr (ssr) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T05:07:39.539Z vite:hmr [file change] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T05:07:39.539Z vite:hmr (client) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T05:07:39.539Z vite:hmr (ssr) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T05:08:01.599Z vite:hmr [file change] [2mcomponents/AddTaskModal.tsx[22m
+2026-04-25T05:08:01.599Z vite:hmr (client) [no modules matched] [2mcomponents/AddTaskModal.tsx[22m
+2026-04-25T05:08:01.599Z vite:hmr (ssr) [no modules matched] [2mcomponents/AddTaskModal.tsx[22m
+2026-04-25T05:08:01.736Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:08:01.736Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:08:01.737Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:08:07.355Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:08:07.355Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:08:07.355Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:08:10.494Z vite:hmr [file change] [2mcomponents/TasksView.tsx[22m
+2026-04-25T05:08:10.494Z vite:hmr (client) [no modules matched] [2mcomponents/TasksView.tsx[22m
+2026-04-25T05:08:10.494Z vite:hmr (ssr) [no modules matched] [2mcomponents/TasksView.tsx[22m
+2026-04-25T05:08:10.563Z vite:hmr [file change] [2mcomponents/TasksView.tsx[22m
+2026-04-25T05:08:10.563Z vite:hmr (client) [no modules matched] [2mcomponents/TasksView.tsx[22m
+2026-04-25T05:08:10.563Z vite:hmr (ssr) [no modules matched] [2mcomponents/TasksView.tsx[22m
+2026-04-25T05:08:30.380Z vite:hmr [file change] [2mApp.tsx[22m
+2026-04-25T05:08:30.380Z vite:hmr (client) [no modules matched] [2mApp.tsx[22m
+2026-04-25T05:08:30.380Z vite:hmr (ssr) [no modules matched] [2mApp.tsx[22m
+2026-04-25T05:08:37.686Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:08:37.686Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:08:37.686Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:13:30.370Z vite:hmr [file change] [2mApp.tsx[22m
+2026-04-25T05:13:30.370Z vite:hmr (client) [no modules matched] [2mApp.tsx[22m
+2026-04-25T05:13:30.370Z vite:hmr (ssr) [no modules matched] [2mApp.tsx[22m
+2026-04-25T05:13:33.904Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:13:33.904Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:13:33.904Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:19:26.360Z vite:hmr [file change] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T05:19:26.360Z vite:hmr (client) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T05:19:26.360Z vite:hmr (ssr) [no modules matched] [2mcomponents/TaskTable.tsx[22m
+2026-04-25T05:21:46.470Z vite:hmr [file change] [2mCode.gs[22m
+2026-04-25T05:21:46.470Z vite:hmr (client) [no modules matched] [2mCode.gs[22m
+2026-04-25T05:21:46.470Z vite:hmr (ssr) [no modules matched] [2mCode.gs[22m
+2026-04-25T05:37:31.784Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:37:31.784Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:37:31.784Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:40:46.128Z vite:hmr [file change] [2mcomponents/KanbanView.tsx[22m
+2026-04-25T05:40:46.128Z vite:hmr (client) [no modules matched] [2mcomponents/KanbanView.tsx[22m
+2026-04-25T05:40:46.128Z vite:hmr (ssr) [no modules matched] [2mcomponents/KanbanView.tsx[22m
+2026-04-25T05:42:29.148Z vite:hmr [file change] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:42:29.148Z vite:hmr (client) [no modules matched] [2m.codex-temp/vite-direct.log[22m
+2026-04-25T05:42:29.148Z vite:hmr (ssr) [no modules matched] [2m.codex-temp/vite-direct.log[22m

@@ -29,6 +29,9 @@ export interface Task {
   assigneeId: string;
   assignee: string;
   assigneeNumber?: string;
+  clientId?: string | number;
+  clientName?: string;
+  clientMobile?: string;
   /* Added missing status values to match application logic and fix comparison errors */
   status: 'Not Yet Started' | 'In Progress' | 'Completed' | 'Pending Billing' | 'Pending for Partner' | 'Pending for Leader' | 'Pending for Member' | 'Pending For Team Leader';
   date: string; // Create Date/Time
@@ -76,9 +79,9 @@ export interface Category {
 export interface Client {
     id: number;
     name: string;
-    email: string;
     mobile: string;
-    address: string;
+    email?: string;
+    address?: string;
     gstNumber?: string;
     telegramGroupId?: string;
     whatsappGroupId?: string;

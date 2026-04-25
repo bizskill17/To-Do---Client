@@ -19,7 +19,7 @@ interface EditTaskModalProps {
   taskTemplates: TaskTemplate[];
 }
 
-export const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, onClose, task, onSave, users }) => {
+export const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, onClose, task, onSave, users, clients }) => {
   const [formData, setFormData] = useState<Partial<Task>>({});
 
   useEffect(() => {
@@ -30,6 +30,7 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, onClose, t
 
   // Showing all names present in User Table (no filtering for active status)
   const userOptions = users.map(u => ({ value: String(u.id), label: u.name }));
+  const clientOptions = clients.map(c => ({ value: String(c.id), label: c.name }));
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -58,8 +59,45 @@ export const EditTaskModal: React.FC<EditTaskModalProps> = ({ isOpen, onClose, t
               label="Assignee" 
               options={userOptions} 
               value={formData.assigneeId || ''} 
-              onChange={(val) => setFormData({...formData, assigneeId: val, assignee: userOptions.find(o => o.value === val)?.label || ''})} 
+              onChange={(val) => {
+                const selected = users.find(u => String(u.id) === String(val));
+                const digitsOnly = String(selected?.mobile || '').replace(/\D/g, '');
+                const normalizedNumber = digitsOnly.length <= 10 ? digitsOnly : digitsOnly.slice(-10);
+                setFormData({...formData, assigneeId: val, assignee: userOptions.find(o => o.value === val)?.label || '', assigneeNumber: normalizedNumber});
+              }} 
               required 
+            />
+          </div>
+          <div className="space-y-1">
+            <SearchableSelect
+              label="Client"
+              options={clientOptions}
+              value={String(formData.clientId || '')}
+              onChange={(val) => {
+                const selectedClient = clients.find(c => String(c.id) === String(val));
+                setFormData({
+                  ...formData,
+                  clientId: val,
+                  clientName: selectedClient?.name || '',
+                  clientMobile: selectedClient?.mobile || ''
+                });
+              }}
+              required
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-bold text-gray-700">Due Date *</label>
+            <input
+              type="date"
+              required
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
+              value={(() => {
+                const due = String(formData.dueDate || '');
+                if (/^\d{4}-\d{2}-\d{2}$/.test(due)) return due;
+                const match = due.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+                return match ? `${match[3]}-${match[2]}-${match[1]}` : '';
+              })()}
+              onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
             />
           </div>
           <div className="flex justify-end pt-4 gap-3">

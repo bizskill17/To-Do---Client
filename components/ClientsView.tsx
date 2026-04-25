@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Plus, Search, Edit2, Trash2, LayoutGrid, LayoutList, Mail, Phone, MapPin, ArrowUpDown, ArrowUp, ArrowDown, Send, MessageCircle, DollarSign, Building2 as BuildingIcon } from 'lucide-react'; 
+import { Plus, Search, Edit2, Trash2, LayoutGrid, LayoutList, Phone, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'; 
 import { Client, Firm } from '../types'; 
 import { AddClientModal } from './AddClientModal';
 import { EditClientModal } from './EditClientModal';
@@ -53,9 +53,7 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
   const filteredClients = useMemo(() => {
     return clients.filter(c =>
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (c.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (c.mobile || '').includes(searchTerm) ||
-      (c.gstNumber || '').toLowerCase().includes(searchTerm.toLowerCase())
+      (c.mobile || '').includes(searchTerm)
     );
   }, [clients, searchTerm]);
 
@@ -98,7 +96,7 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-indigo-600">Client Master</h2>
-          <p className="text-sm text-gray-500 mt-1">Manage client details, GST, and contacts</p>
+          <p className="text-sm text-gray-500 mt-1">Manage client name and mobile number</p>
         </div>
       </div>
 
@@ -149,9 +147,9 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
                 <th className={thClass} onClick={() => requestSort('name')}>
                   <div className="flex items-center">Client Name {getSortIcon('name')}</div>
                 </th>
-                <th className={thClass}>GSTIN</th>
-                <th className={thClass}>Email</th>
-                <th className={thClass}>Mobile</th>
+                <th className={thClass} onClick={() => requestSort('mobile')}>
+                  <div className="flex items-center">Client Mobile Number {getSortIcon('mobile')}</div>
+                </th>
                 <th className="px-6 py-4 text-xs font-semibold text-white uppercase tracking-wider text-center">Actions</th>
               </tr>
             </thead>
@@ -159,8 +157,6 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
               {sortedClients.map((client) => (
                 <tr key={client.id} className="hover:bg-gray-50 transition-colors">
                   <td className={`${tdClass} font-medium`}>{client.name}</td>
-                  <td className={tdClass}>{client.gstNumber || '-'}</td>
-                  <td className={tdClass}>{client.email || '-'}</td>
                   <td className={tdClass}>{client.mobile || '-'}</td>
                   <td className={`${tdClass} text-center`}>
                     <div className="flex items-center justify-center space-x-3">
@@ -183,7 +179,6 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
                     <h3 className="font-bold text-gray-900">{client.name}</h3>
                  </div>
                  <div className="space-y-2 text-sm text-gray-600 mb-4">
-                     <div className="flex items-center gap-2"><Mail size={14} className="text-gray-400" /><span>{client.email || 'N/A'}</span></div>
                      <div className="flex items-center gap-2"><Phone size={14} className="text-gray-400" /><span>{client.mobile || 'N/A'}</span></div>
                 </div>
                  <div className="flex gap-2 pt-3 border-t border-gray-100">

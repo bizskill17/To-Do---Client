@@ -99,6 +99,9 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                 <th className={thClass} onClick={() => requestSort('date')}><div className="flex items-center">Create Date/Time {getSortIcon('date')}</div></th>
                 <th className={thClass} onClick={() => requestSort('createdBy')}><div className="flex items-center">Created By {getSortIcon('createdBy')}</div></th>
                 <th className={`${thClass} min-w-[300px]`} onClick={() => requestSort('title')}><div className="flex items-center">Task {getSortIcon('title')}</div></th>
+                <th className={`${thClass} min-w-[220px]`} onClick={() => requestSort('clientName')}><div className="flex items-center">Client {getSortIcon('clientName')}</div></th>
+                <th className={thClass} onClick={() => requestSort('clientMobile')}><div className="flex items-center">Client Mobile {getSortIcon('clientMobile')}</div></th>
+                <th className={thClass} onClick={() => requestSort('dueDate')}><div className="flex items-center">Due Date {getSortIcon('dueDate')}</div></th>
                 <th className={thClass} onClick={() => requestSort('assignee')}><div className="flex items-center">Assignee {getSortIcon('assignee')}</div></th>
                 <th className={thClass} onClick={() => requestSort('status')}><div className="flex items-center">Status {getSortIcon('status')}</div></th>
                 <th className={thClass} onClick={() => requestSort('lastUpdateDate')}><div className="flex items-center">Last Updated {getSortIcon('lastUpdateDate')}</div></th>
@@ -130,6 +133,9 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                     <td className={`${tdClass} whitespace-nowrap`}>{formatToIndianDateTime(task.date)}</td>
                     <td className={tdClass}>{task.createdBy}</td>
                     <td className={`${tdClass} font-medium`}>{task.title}</td>
+                    <td className={tdClass}>{task.clientName || '-'}</td>
+                    <td className={tdClass}>{task.clientMobile || '-'}</td>
+                    <td className={`${tdClass} whitespace-nowrap`}>{task.dueDate || '-'}</td>
                     <td className={tdClass}>{task.assignee}</td>
                     <td className={tdClass}><span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm ${getStatusColor(task.status)}`}>{task.status}</span></td>
                     <td className={`${tdClass} whitespace-nowrap`}>{formatToIndianDateTime(task.lastUpdateDate)}</td>
@@ -168,6 +174,9 @@ export const TaskTable: React.FC<TaskTableProps> = ({
               </div>
               <h3 className="font-bold text-gray-900 mb-2">{task.title}</h3>
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-3">
+                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Client</span>{task.clientName || '-'}</div>
+                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Client Mobile</span>{task.clientMobile || '-'}</div>
+                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Due Date</span>{task.dueDate || '-'}</div>
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Assignee</span>{task.assignee}</div>
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Created By</span>{task.createdBy}</div>
                 <div className="col-span-2"><span className="font-bold block uppercase text-[10px] text-gray-400">Created At</span>{formatToIndianDateTime(task.date)}</div>

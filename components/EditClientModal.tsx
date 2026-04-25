@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Plus } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Client, Firm } from '../types';
-import { SearchableSelect } from './SearchableSelect';
 
 interface EditClientModalProps {
   isOpen: boolean;
@@ -23,8 +22,6 @@ export const EditClientModal: React.FC<EditClientModalProps> = ({ isOpen, onClos
 
   if (!isOpen || !client) return null;
 
-  const firmOptions = firms.map(f => ({ value: f.name, label: f.name }));
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-opacity">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -37,19 +34,9 @@ export const EditClientModal: React.FC<EditClientModalProps> = ({ isOpen, onClos
             <label className="text-sm font-bold">Client Name *</label>
             <input required className="w-full px-4 py-2 border rounded-lg" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-sm font-bold">GST Number</label>
-              <input className="w-full px-4 py-2 border rounded-lg uppercase" value={formData.gstNumber || ''} onChange={e => setFormData({...formData, gstNumber: e.target.value})} />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-bold">Mobile</label>
-              <input className="w-full px-4 py-2 border rounded-lg" value={formData.mobile || ''} onChange={e => setFormData({...formData, mobile: e.target.value})} />
-            </div>
-          </div>
           <div className="space-y-1">
-            <label className="text-sm font-bold">Telegram Group ID</label>
-            <input className="w-full px-4 py-2 border rounded-lg" value={formData.telegramGroupId || ''} onChange={e => setFormData({...formData, telegramGroupId: e.target.value})} />
+            <label className="text-sm font-bold">Client Mobile Number *</label>
+            <input required className="w-full px-4 py-2 border rounded-lg" value={formData.mobile || ''} onChange={e => setFormData({...formData, mobile: e.target.value})} />
           </div>
           
           <div className="flex justify-end gap-3 pt-4 border-t">

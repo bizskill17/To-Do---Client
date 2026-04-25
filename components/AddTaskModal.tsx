@@ -18,31 +18,40 @@ interface AddTaskModalProps {
   taskTemplates: TaskTemplate[]; 
 }
 
-export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onSave, users, categories, taskTemplates }) => {
+export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onSave, users, clients }) => {
   const [formData, setFormData] = useState({
     title: '',
     assigneeId: '',
     assignee: '',
-    assigneeNumber: ''
+    assigneeNumber: '',
+    clientId: '',
+    clientName: '',
+    clientMobile: '',
+    dueDate: ''
   });
 
   useEffect(() => {
-    if (isOpen) setFormData({ title: '', assigneeId: '', assignee: '', assigneeNumber: '' });
+    if (isOpen) setFormData({ title: '', assigneeId: '', assignee: '', assigneeNumber: '', clientId: '', clientName: '', clientMobile: '', dueDate: '' });
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   // Showing all names present in User Table (no filtering for active status)
   const userOptions = users.map(u => ({ value: String(u.id), label: u.name }));
+  const clientOptions = clients.map(c => ({ value: String(c.id), label: c.name }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.assigneeId) return;
+    if (!formData.title || !formData.assigneeId || !formData.clientId || !formData.dueDate) return;
     onSave({
       title: formData.title,
       assigneeId: formData.assigneeId,
       assignee: formData.assignee,
-      assigneeNumber: formData.assigneeNumber
+      assigneeNumber: formData.assigneeNumber,
+      clientId: formData.clientId,
+      clientName: formData.clientName,
+      clientMobile: formData.clientMobile,
+      dueDate: formData.dueDate
     });
     onClose();
   };
@@ -89,6 +98,34 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onS
               }} 
               required 
               placeholder="Select User..." 
+            />
+          </div>
+          <div className="space-y-1">
+            <SearchableSelect
+              label="Client"
+              options={clientOptions}
+              value={formData.clientId}
+              onChange={(val) => {
+                const selectedClient = clients.find(c => String(c.id) === String(val));
+                setFormData({
+                  ...formData,
+                  clientId: val,
+                  clientName: selectedClient?.name || '',
+                  clientMobile: selectedClient?.mobile || ''
+                });
+              }}
+              required
+              placeholder="Select Client..."
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-bold text-gray-700">Due Date *</label>
+            <input
+              type="date"
+              required
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
+              value={formData.dueDate}
+              onChange={e => setFormData({ ...formData, dueDate: e.target.value })}
             />
           </div>
           <div className="flex justify-end pt-4 gap-3">

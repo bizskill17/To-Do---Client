@@ -87,12 +87,13 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
       if (filterStatus !== 'All Status' && task.status !== filterStatus) return false;
       if (filterAssignee !== 'All Leaders' && !task.assignee.includes(filterAssignee)) return false;
+      if (filterClient !== 'All Clients' && task.clientName !== filterClient) return false;
 
-      // Filter by Created Date
+      // Filter by Due Date
       if (dateFrom || dateTo) {
-        const taskDateISO = parseToISO(task.date);
-        if (dateFrom && taskDateISO < dateFrom) return false;
-        if (dateTo && taskDateISO > dateTo) return false;
+        const dueDateISO = parseToISO(task.dueDate || '');
+        if (dateFrom && dueDateISO < dateFrom) return false;
+        if (dateTo && dueDateISO > dateTo) return false;
       }
 
       // Filter by Last Updated Date
@@ -104,11 +105,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
       return true;
     });
-  }, [tasks, filterType, searchTerm, filterStatus, filterAssignee, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo]);
+  }, [tasks, filterType, searchTerm, filterStatus, filterAssignee, filterClient, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo]);
 
   const paginatedTasks = useMemo(() => {
     const sorted = [...filteredTasks].sort((a, b) => {
-        if (sortKey === 'date' || sortKey === 'lastUpdateDate') {
+        if (sortKey === 'date' || sortKey === 'lastUpdateDate' || sortKey === 'dueDate') {
           const aTime = parseToTimestamp(a[sortKey]);
           const bTime = parseToTimestamp(b[sortKey]);
 
@@ -152,6 +153,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
   const clearAllFilters = () => {
     setFilterStatus('All Status');
+    setFilterClient('All Clients');
     setFilterAssignee('All Leaders');
     setDateFrom('');
     setDateTo('');
@@ -161,7 +163,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
   };
 
   const exportToExcel = () => {
-    const headers = ["S.No.", "Created At", "Created By", "Task", "Assignee", "Status", "Last Updated", "Remarks"];
+    const headers = ["S.No.", "Created At", "Created By", "Task", "Client", "Client Mobile", "Due Date", "Assignee", "Status", "Last Updated", "Remarks"];
     const csvRows = [headers.join(",")];
     
     filteredTasks.forEach((task, index) => {
@@ -170,6 +172,9 @@ export const TasksView: React.FC<TasksViewProps> = ({
         `"${task.date}"`,
         `"${task.createdBy}"`,
         `"${task.title.replace(/"/g, '""')}"`,
+        `"${task.clientName || ''}"`,
+        `"${task.clientMobile || ''}"`,
+        `"${task.dueDate || ''}"`,
         `"${task.assignee}"`,
         `"${task.status}"`,
         `"${task.lastUpdateDate}"`,
@@ -196,12 +201,15 @@ export const TasksView: React.FC<TasksViewProps> = ({
     doc.setFontSize(10);
     doc.text(`Generated on: ${new Date().toLocaleString('en-GB')}`, 14, 22);
 
-    const tableHeaders = [["S.No", "Created", "Created By", "Task", "Assignee", "Status", "Last Update", "Remarks"]];
+    const tableHeaders = [["S.No", "Created", "Created By", "Task", "Client", "Client Mobile", "Due Date", "Assignee", "Status", "Last Update", "Remarks"]];
     const tableData = filteredTasks.map((t, i) => [
       i + 1,
       t.date,
       t.createdBy,
       t.title,
+      t.clientName || '-',
+      t.clientMobile || '-',
+      t.dueDate || '-',
       t.assignee,
       t.status,
       t.lastUpdateDate,
@@ -219,7 +227,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
     doc.save(`Tasks_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
-  const hasActiveFilters = filterStatus !== 'All Status' || filterAssignee !== 'All Leaders' || dateFrom || dateTo || lastUpdateFrom || lastUpdateTo || searchTerm;
+  const hasActiveFilters = filterStatus !== 'All Status' || filterClient !== 'All Clients' || filterAssignee !== 'All Leaders' || dateFrom || dateTo || lastUpdateFrom || lastUpdateTo || searchTerm;
 
   return (
     <div className="space-y-6 pb-10">
@@ -286,7 +294,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
         </div>
         
         {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Status</label>
               <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm">
@@ -298,6 +306,17 @@ export const TasksView: React.FC<TasksViewProps> = ({
             </div>
             <div>
               <SearchableSelect label="Assignee" options={users.map(u => ({ value: u.name, label: u.name }))} value={filterAssignee === 'All Leaders' ? '' : filterAssignee} onChange={(v) => setFilterAssignee(v || 'All Leaders')} />
+            </div>
+            <div>
+              <SearchableSelect label="Client" options={clients.map(c => ({ value: c.name, label: c.name }))} value={filterClient === 'All Clients' ? '' : filterClient} onChange={(v) => setFilterClient(v || 'All Clients')} />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Due Date From</label>
+              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Due Date To</label>
+              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Last Updated From</label>
