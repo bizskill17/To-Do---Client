@@ -33,10 +33,13 @@ interface TasksViewProps {
   syncingIds?: Set<string | number>;
   currentUser?: User | null;
   taskTemplates: TaskTemplate[];
+  taskInsertSignal?: number;
   filterStatus: string;
   setFilterStatus: (val: string) => void;
   filterPriority: string;
   setFilterPriority: (val: string) => void;
+  filterCategory: string;
+  setFilterCategory: (val: string) => void;
   filterClient: string;
   setFilterClient: (val: string) => void; 
   filterOwner: string;
@@ -57,7 +60,7 @@ interface TasksViewProps {
 }
 
 export const TasksView: React.FC<TasksViewProps> = ({ 
-  title, description, onAddTask, tasks, users, categories, statuses, clients, firms, actionLogs, onOpenUpdateModal, onEditTask, onBulkUpdateTask, onDeleteTask, onExportExcel, onViewHistory, filterType = 'all', onAddCategory, onAddClient, onAddFirm, syncingIds = new Set(), currentUser, taskTemplates, filterStatus, setFilterStatus, filterPriority, setFilterPriority, filterClient, setFilterClient, filterOwner, setFilterOwner, filterAssignee, setFilterAssignee, dateFrom, setDateFrom, dateTo, setDateTo, lastUpdateFrom, setLastUpdateFrom, lastUpdateTo, setLastUpdateTo, searchTerm, setSearchTerm, hideCreationInfo = false
+  title, description, onAddTask, tasks, users, categories, statuses, clients, firms, actionLogs, onOpenUpdateModal, onEditTask, onBulkUpdateTask, onDeleteTask, onExportExcel, onViewHistory, filterType = 'all', onAddCategory, onAddClient, onAddFirm, syncingIds = new Set(), currentUser, taskTemplates, taskInsertSignal = 0, filterStatus, setFilterStatus, filterPriority, setFilterPriority, filterCategory, setFilterCategory, filterClient, setFilterClient, filterOwner, setFilterOwner, filterAssignee, setFilterAssignee, dateFrom, setDateFrom, dateTo, setDateTo, lastUpdateFrom, setLastUpdateFrom, lastUpdateTo, setLastUpdateTo, searchTerm, setSearchTerm, hideCreationInfo = false
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isBulkUpdateModalOpen, setIsBulkUpdateModalOpen] = useState(false);
@@ -73,7 +76,15 @@ export const TasksView: React.FC<TasksViewProps> = ({
   useEffect(() => {
     setSelectedIds([]);
     setCurrentPage(1);
-  }, [filterType, filterStatus, filterPriority, filterClient, filterOwner, filterAssignee, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo, searchTerm]);
+  }, [filterType, filterStatus, filterPriority, filterCategory, filterClient, filterOwner, filterAssignee, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo, searchTerm]);
+
+  useEffect(() => {
+    if (taskInsertSignal > 0) {
+      setSortKey('date');
+      setSortDir('desc');
+      setCurrentPage(1);
+    }
+  }, [taskInsertSignal]);
 
   const filteredTasks = useMemo(() => {
     return tasks.filter(task => {
@@ -89,6 +100,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
       if (filterStatus !== 'All Status' && task.status !== filterStatus) return false;
       if (filterAssignee !== 'All Leaders' && !task.assignee.includes(filterAssignee)) return false;
+      if (filterCategory !== 'All Categories' && String(task.category || '') !== filterCategory) return false;
       if (filterClient !== 'All Clients' && task.clientName !== filterClient) return false;
 
       // Filter by Due Date
@@ -107,7 +119,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
       return true;
     });
-  }, [tasks, filterType, searchTerm, filterStatus, filterAssignee, filterClient, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo]);
+  }, [tasks, filterType, searchTerm, filterStatus, filterAssignee, filterCategory, filterClient, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo]);
 
   const paginatedTasks = useMemo(() => {
     const sorted = [...filteredTasks].sort((a, b) => {
@@ -158,6 +170,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
   const clearAllFilters = () => {
     setFilterStatus('All Status');
+    setFilterCategory('All Categories');
     setFilterClient('All Clients');
     setFilterAssignee('All Leaders');
     setDateFrom('');
@@ -241,7 +254,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
     doc.save(`Tasks_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
-  const hasActiveFilters = filterStatus !== 'All Status' || filterClient !== 'All Clients' || filterAssignee !== 'All Leaders' || dateFrom || dateTo || lastUpdateFrom || lastUpdateTo || searchTerm;
+  const hasActiveFilters = filterStatus !== 'All Status' || filterCategory !== 'All Categories' || filterClient !== 'All Clients' || filterAssignee !== 'All Leaders' || dateFrom || dateTo || lastUpdateFrom || lastUpdateTo || searchTerm;
 
   return (
     <div className="space-y-6 pb-10">
@@ -272,6 +285,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
           </div>
 
           {selectedIds.length > 0 && (
+            filterType !== 'pending-billing' && (
             <button 
               onClick={() => setIsBulkUpdateModalOpen(true)}
               className="flex items-center space-x-1 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm font-medium shadow-sm transition-colors"
@@ -279,6 +293,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
               <Settings2 size={16} />
               <span>Bulk Action ({selectedIds.length})</span>
             </button>
+            )
           )}
           <button onClick={() => onAddTask()} className="flex items-center space-x-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium shadow-sm transition-colors"><Plus size={16} /><span>Add Task</span></button>
           <button onClick={() => setShowFilters(!showFilters)} className={`p-2 border rounded-md transition-all ${showFilters || hasActiveFilters ? 'bg-indigo-600 text-white border-indigo-700' : 'bg-white'}`}><Filter size={18} /></button>
@@ -290,7 +305,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-200">
-        <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
             <input type="text" placeholder="Search tasks..." className="w-full pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-100 text-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
@@ -307,21 +322,28 @@ export const TasksView: React.FC<TasksViewProps> = ({
           )}
         </div>
         
-        {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
-            <div>
-              <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Status</label>
-              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm">
-                <option>All Status</option>
-                {statuses.map(status => <option key={status.id} value={status.name}>{status.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <SearchableSelect label="Assignee" options={users.map(u => ({ value: u.name, label: u.name }))} value={filterAssignee === 'All Leaders' ? '' : filterAssignee} onChange={(v) => setFilterAssignee(v || 'All Leaders')} />
-            </div>
-            <div>
-              <SearchableSelect label="Client" options={clients.map(c => ({ value: c.name, label: c.name }))} value={filterClient === 'All Clients' ? '' : filterClient} onChange={(v) => setFilterClient(v || 'All Clients')} />
-            </div>
+	        {showFilters && (
+	          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
+	            <div>
+	              <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Status</label>
+	              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm">
+	                <option>All Status</option>
+	                {statuses.map(status => <option key={status.id} value={status.name}>{status.name}</option>)}
+	              </select>
+	            </div>
+	            <div>
+	              <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Category</label>
+	              <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm">
+	                <option>All Categories</option>
+	                {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+	              </select>
+	            </div>
+	            <div>
+	              <SearchableSelect label="Assignee" options={users.map(u => ({ value: u.name, label: u.name }))} value={filterAssignee === 'All Leaders' ? '' : filterAssignee} onChange={(v) => setFilterAssignee(v || 'All Leaders')} />
+	            </div>
+	            <div>
+	              <SearchableSelect label="Client" options={clients.map(c => ({ value: c.name, label: c.name }))} value={filterClient === 'All Clients' ? '' : filterClient} onChange={(v) => setFilterClient(v || 'All Clients')} />
+	            </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Due Date From</label>
               <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm" />
@@ -357,7 +379,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
         sortDir={sortDir}
         onSort={(key, dir) => { setSortKey(key); setSortDir(dir); }}
         startIndex={(currentPage - 1) * itemsPerPage + 1}
-        showSelection={true}
+        showSelection={filterType !== 'pending-billing'}
         hideCreationInfo={false}
         isBillingView={filterType === 'pending-billing'}
       />
@@ -371,15 +393,17 @@ export const TasksView: React.FC<TasksViewProps> = ({
       )}
 
       <EditTaskModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} task={selectedTask} onSave={onEditTask} onAddCategory={onAddCategory} onAddClient={onAddClient} onAddFirm={onAddFirm} users={users} categories={categories} clients={clients} firms={firms} taskTemplates={taskTemplates} />
-      <BulkUpdateModal
-        isOpen={isBulkUpdateModalOpen}
-        onClose={() => setIsBulkUpdateModalOpen(false)}
-        count={selectedIds.length}
-        onUpdate={handleBulkUpdate}
-        users={users}
-        statuses={statuses}
-        mode={filterType === 'pending-billing' ? 'billing' : 'status'}
-      />
+      {filterType !== 'pending-billing' && (
+        <BulkUpdateModal
+          isOpen={isBulkUpdateModalOpen}
+          onClose={() => setIsBulkUpdateModalOpen(false)}
+          count={selectedIds.length}
+          onUpdate={handleBulkUpdate}
+          users={users}
+          statuses={statuses}
+          mode="status"
+        />
+      )}
     </div>
   );
 };

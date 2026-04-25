@@ -201,11 +201,12 @@ export default function App() {
   const [messageSettings, setMessageSettings] = useState<MessageSettings>({ userId: '', password: '', ownerNumber: '' });
   const [taskTemplates, setTaskTemplates] = useState<TaskTemplate[]>([]);
 
-  const [filterStatus, setFilterStatus] = useState('All Status');
-  const [filterPriority, setFilterPriority] = useState('All Priorities');
-  const [filterClient, setFilterClient] = useState('All Clients'); 
-  const [filterOwner, setFilterOwner] = useState('All Partners');
-  const [filterAssignee, setFilterAssignee] = useState('All Leaders');
+	  const [filterStatus, setFilterStatus] = useState('All Status');
+	  const [filterPriority, setFilterPriority] = useState('All Priorities');
+	  const [filterCategory, setFilterCategory] = useState('All Categories');
+	  const [filterClient, setFilterClient] = useState('All Clients'); 
+	  const [filterOwner, setFilterOwner] = useState('All Partners');
+	  const [filterAssignee, setFilterAssignee] = useState('All Leaders');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [lastUpdateFrom, setLastUpdateFrom] = useState('');
@@ -224,6 +225,7 @@ export default function App() {
   const [isUpdateTaskModalOpen, setIsUpdateTaskModalOpen] = useState(false);
   const [selectedTaskForUpdate, setSelectedTaskForUpdate] = useState<Task | null>(null);
   const [updateTaskMode, setUpdateTaskMode] = useState<'status' | 'billing'>('status');
+  const [taskInsertSignal, setTaskInsertSignal] = useState(0);
 
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [selectedTaskForHistory, setSelectedTaskForHistory] = useState<Task | null>(null);
@@ -245,10 +247,10 @@ export default function App() {
 	      if (result.success) {
 	        const { data } = result;
 
-	        const normalizeTasks = (list: any[]) => (list || []).map(item => ({
-	            ...item,
-	            id: item.taskid || item.id || 0,
-	            title: String(item.task || item.title || ''),
+		        const normalizeTasks = (list: any[]) => (list || []).map(item => ({
+		            ...item,
+		            id: item.taskid || item.id || 0,
+		            title: String(item.task || item.title || ''),
 	            assigneeId: String(item.assigneeid || ''),
 	            assignee: String(item.assignee || ''),
 	            assigneeNumber: String(item.assigneenumber || ''),
@@ -259,12 +261,15 @@ export default function App() {
               billable: String(item.billable || ''),
               billingStatus: String(item.billingstatus || ''),
 	            status: String(item.status || 'Not Yet Started'),
-	            date: formatToIndianDateTime(item.createdatetime || item.date || ''),
-              dueDate: formatToIndianDate(item.duedate || item.dueDate || ''),
-	            createdBy: String(item.createdby || ''),
-	            lastUpdateDate: formatToIndianDateTime(item.lastupdated || ''),
-	            lastUpdateRemarks: String(item.lastupdateremarks || ''),
-	        }));
+		            date: formatToIndianDateTime(item.createdatetime || item.date || ''),
+	              dueDate: formatToIndianDate(item.duedate || item.dueDate || ''),
+		            createdBy: String(item.createdby || ''),
+		            lastUpdateDate: formatToIndianDateTime(item.lastupdated || ''),
+		            lastUpdateRemarks: String(item.lastupdateremarks || ''),
+	              invoiceDate: formatToIndianDate(item.invdate || item.invoicedate || item.invoiceDate || ''),
+	              invoiceNumber: String(item.invno || item.invoiceno || item.invoicenumber || item.invoiceNumber || ''),
+	              invoiceAmount: item.amount !== undefined && item.amount !== null && String(item.amount).trim() !== '' ? Number(item.amount) : (undefined as any),
+		        }));
 
 	        if (targetSheet === 'Tasks') {
 	            setTasks(normalizeTasks(data));
@@ -343,10 +348,10 @@ export default function App() {
 	        payloadData.status = 'Not Yet Started';
 	        payloadData.createdatetime = timestamp;
 	        payloadData.createdby = currentUser?.name || 'System';
-	    } else if (action === 'updateTask') {
-	        payloadData.id = data.id;
-          payloadData.task = data.title;
-          payloadData.assigneeid = data.assigneeId;
+		    } else if (action === 'updateTask') {
+		        payloadData.id = data.id;
+	          payloadData.task = data.title;
+	          payloadData.assigneeid = data.assigneeId;
           payloadData.assignee = data.assignee;
           payloadData.assigneenumber = data.assigneeNumber || '';
 	        payloadData.clientid = data.clientId || '';
@@ -354,13 +359,16 @@ export default function App() {
 	        payloadData.clientmobilenumber = data.clientMobile || '';
           payloadData.category = data.category || '';
           payloadData.billable = data.billable || '';
-          payloadData.billingstatus = data.billingStatus || '';
-          payloadData.duedate = data.dueDate || '';
-	        payloadData.status = data.status;
-	        payloadData.lastupdated = timestamp;
-	        payloadData.lastupdateremarks = data.lastUpdateRemarks;
-          payloadData.skipmessage = data.skipMessage ? 'TRUE' : 'FALSE';
-	    } else if (action === 'saveMessageSettings') {
+	          payloadData.billingstatus = data.billingStatus || '';
+	          payloadData.invdate = data.invoiceDate || '';
+	          payloadData.invno = data.invoiceNumber || '';
+	          payloadData.amount = data.invoiceAmount !== undefined && data.invoiceAmount !== null ? data.invoiceAmount : '';
+	          payloadData.duedate = data.dueDate || '';
+		        payloadData.status = data.status;
+		        payloadData.lastupdated = timestamp;
+		        payloadData.lastupdateremarks = data.lastUpdateRemarks;
+	          payloadData.skipmessage = data.skipMessage ? 'TRUE' : 'FALSE';
+		    } else if (action === 'saveMessageSettings') {
 	        payloadData.userid = data.userId;
 	        payloadData.password = data.password;
 	        payloadData.ownernumber = data.ownerNumber;
@@ -434,7 +442,7 @@ export default function App() {
     const tempTask: Task = { 
         ...taskData, 
         id: tempId, 
-        date: new Date().toLocaleString('en-GB'), 
+        date: formatToIndianDateTime(new Date()),
         dueDate: formatToIndianDate(taskData.dueDate || ''),
         status: 'Not Yet Started',
         createdBy: currentUser?.name || 'System',
@@ -442,6 +450,7 @@ export default function App() {
         lastUpdateRemarks: ''
     };
     setTasks(prev => [tempTask, ...prev]);
+    setTaskInsertSignal(prev => prev + 1);
     setSyncingIds(prev => new Set(prev).add(tempId));
     try { 
         await apiPost('addTask', taskData, 'Tasks'); 
@@ -458,7 +467,7 @@ export default function App() {
 
   const handleBulkAddTask = async (tasksList: any[]) => {
     // Show them immediately in UI
-    const now = new Date().toLocaleString('en-GB');
+    const now = formatToIndianDateTime(new Date());
     const newTasks: Task[] = tasksList.map((t, i) => ({
       ...t,
       id: String(-(Date.now() + i)),
@@ -470,6 +479,7 @@ export default function App() {
     }));
     
     setTasks(prev => [...newTasks, ...prev]);
+    setTaskInsertSignal(prev => prev + 1);
     
     // Upload them one by one to sheet
     for (const t of tasksList) {
@@ -601,14 +611,15 @@ export default function App() {
     }
   };
 
-  const clearTaskFilters = useCallback(() => {
-    setFilterStatus('All Status');
-    setFilterPriority('All Priorities');
-    setFilterClient('All Clients');
-    setFilterOwner('All Partners');
-    setFilterAssignee('All Leaders');
-    setDateFrom('');
-    setDateTo('');
+	  const clearTaskFilters = useCallback(() => {
+	    setFilterStatus('All Status');
+	    setFilterPriority('All Priorities');
+	    setFilterCategory('All Categories');
+	    setFilterClient('All Clients');
+	    setFilterOwner('All Partners');
+	    setFilterAssignee('All Leaders');
+	    setDateFrom('');
+	    setDateTo('');
     setLastUpdateFrom('');
     setLastUpdateTo('');
     setSearchTerm('');
@@ -619,11 +630,12 @@ export default function App() {
     setActiveTab(tab);
   }, [clearTaskFilters]);
 
-  const commonTaskProps = useMemo(() => ({
-    users, categories, statuses, clients, firms, syncingIds, currentUser, taskTemplates,
-    filterStatus, setFilterStatus, filterPriority, setFilterPriority, 
-    filterClient, setFilterClient, filterOwner, setFilterOwner, filterAssignee, setFilterAssignee, 
-    dateFrom, setDateFrom, dateTo, setDateTo, lastUpdateFrom, setLastUpdateFrom, lastUpdateTo, setLastUpdateTo, searchTerm, setSearchTerm,
+	  const commonTaskProps = useMemo(() => ({
+	    users, categories, statuses, clients, firms, syncingIds, currentUser, taskTemplates, taskInsertSignal,
+	    filterStatus, setFilterStatus, filterPriority, setFilterPriority, 
+	    filterCategory, setFilterCategory,
+	    filterClient, setFilterClient, filterOwner, setFilterOwner, filterAssignee, setFilterAssignee, 
+	    dateFrom, setDateFrom, dateTo, setDateTo, lastUpdateFrom, setLastUpdateFrom, lastUpdateTo, setLastUpdateTo, searchTerm, setSearchTerm,
     onOpenUpdateModal: (task: Task, mode: 'status' | 'billing' = 'status') => { setSelectedTaskForUpdate(task); setUpdateTaskMode(mode); setIsUpdateTaskModalOpen(true); },
     onEditTask: (task: Task) => { setSelectedTaskForEdit(task); setIsEditTaskModalOpen(true); }, 
     onDeleteTask: (id: string | number) => { setTasks(prev => prev.filter(t => t.id !== id)); apiPost('deleteRecord', { id }, 'Tasks'); }, 
@@ -640,7 +652,7 @@ export default function App() {
             if (task) await apiPost('updateTask', { ...task, ...updates }, 'Tasks');
         }
     }
-  }), [users, categories, statuses, clients, firms, syncingIds, currentUser, taskTemplates, filterStatus, filterPriority, filterClient, filterOwner, filterAssignee, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo, searchTerm, tasks, apiPost]);
+	  }), [users, categories, statuses, clients, firms, syncingIds, currentUser, taskTemplates, taskInsertSignal, filterStatus, filterPriority, filterCategory, filterClient, filterOwner, filterAssignee, dateFrom, dateTo, lastUpdateFrom, lastUpdateTo, searchTerm, tasks, apiPost]);
 
 	  const navItems: NavItem[] = useMemo(() => [
 	    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },

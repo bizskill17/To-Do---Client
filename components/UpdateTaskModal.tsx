@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { X, AlertTriangle, Clock, DollarSign, UserRoundMinus } from 'lucide-react'; 
 import { Task, User, Client, ActionLogEntry, Firm, StatusOption } from '../types'; 
 import { SearchableSelect } from './SearchableSelect';
+import { parseToISO, formatToIndianDate } from '../App';
 
 interface UpdateTaskModalProps {
   isOpen: boolean;
@@ -22,6 +23,9 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
   const [remarksInput, setRemarksInput] = useState<string>('');
   const [billingRateInput, setBillingRateInput] = useState<string>(''); 
   const [firmToBillInput, setFirmToBillInput] = useState<string>(''); 
+  const [invoiceDateInput, setInvoiceDateInput] = useState<string>('');
+  const [invoiceNumberInput, setInvoiceNumberInput] = useState<string>('');
+  const [invoiceAmountInput, setInvoiceAmountInput] = useState<string>('');
   const [error, setError] = useState('');
   const [isConfirming, setIsConfirming] = useState(false);
 
@@ -48,6 +52,9 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
       setRemarksInput('');
       setBillingRateInput(task.billingRate ? String(task.billingRate) : '');
       setFirmToBillInput(String(task.firmToBill || ''));
+      setInvoiceDateInput(task.invoiceDate ? parseToISO(task.invoiceDate) : '');
+      setInvoiceNumberInput(String(task.invoiceNumber || ''));
+      setInvoiceAmountInput(task.invoiceAmount !== undefined && task.invoiceAmount !== null ? String(task.invoiceAmount) : '');
       setError('');
       setIsConfirming(false);
     }
@@ -80,6 +87,18 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
 
   const handleBillingRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setBillingRateInput(e.target.value);
+  };
+
+  const handleInvoiceDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInvoiceDateInput(e.target.value);
+  };
+
+  const handleInvoiceNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInvoiceNumberInput(e.target.value);
+  };
+
+  const handleInvoiceAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInvoiceAmountInput(e.target.value);
   };
 
   const handleFirmToBillChange = (val: string | string[]) => {
@@ -132,20 +151,25 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const timestamp = `${day}/${month}/${year} ${hours}:${minutes}`;
 
-    const updatedTask: Task = { 
-        ...task, 
-        status: mode === 'billing' ? task.status : formData.status as any,
-        billingStatus: mode === 'billing' ? String(formData.billingStatus || 'Done') : task.billingStatus,
-        lastUpdateRemarks: remarksInput, 
-        lastUpdateDate: timestamp, // Crucial for immediate local feedback (Screenshot 4)
-        hoursTaken: task.hoursTaken || 0,
-        billingRate: parseFloat(billingRateInput) || 0, 
-        firmToBill: firmToBillInput,
-    };
-    
-    onUpdate(updatedTask);
-    onClose();
-  };
+	    const updatedTask: Task = { 
+	        ...task, 
+	        status: mode === 'billing' ? task.status : formData.status as any,
+	        billingStatus: mode === 'billing' ? String(formData.billingStatus || '') : task.billingStatus,
+	        lastUpdateRemarks: remarksInput, 
+	        lastUpdateDate: timestamp, // Crucial for immediate local feedback (Screenshot 4)
+	        hoursTaken: task.hoursTaken || 0,
+	        billingRate: parseFloat(billingRateInput) || 0, 
+	        firmToBill: firmToBillInput,
+	        invoiceDate: mode === 'billing' ? (invoiceDateInput ? formatToIndianDate(invoiceDateInput) : '') : task.invoiceDate,
+	        invoiceNumber: mode === 'billing' ? invoiceNumberInput : task.invoiceNumber,
+	        invoiceAmount: mode === 'billing'
+	          ? (String(invoiceAmountInput || '').trim() ? (parseFloat(invoiceAmountInput) || 0) : ('' as any))
+	          : task.invoiceAmount,
+	    };
+	    
+	    onUpdate(updatedTask);
+	    onClose();
+	  };
 
   const options = mode === 'billing' ? ['Done'] : getUserSpecificStatusOptions();
 
@@ -191,18 +215,56 @@ export const UpdateTaskModal: React.FC<UpdateTaskModalProps> = ({ isOpen, onClos
               )}
 
               {mode === 'billing' ? (
-                <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-900 block mb-1">Billing Status <span className="text-red-500">*</span></label>
-                  <select
-                    name="billingStatus"
-                    required
-                    value={String(formData.billingStatus || '')}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
-                  >
-                    <option value="">Select Billing Status...</option>
-                    <option value="Done">Done</option>
-                  </select>
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-900 block mb-1">Billing Status <span className="text-red-500">*</span></label>
+                    <select
+                      name="billingStatus"
+                      required
+                      value={String(formData.billingStatus || '')}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none"
+                    >
+                      <option value="">Select Billing Status...</option>
+                      <option value="Done">Done</option>
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium text-gray-900 block mb-1">Inv Date</label>
+                      <input
+                        type="date"
+                        value={invoiceDateInput}
+                        onChange={handleInvoiceDateChange}
+                        className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none text-gray-900"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium text-gray-900 block mb-1">Inv No.</label>
+                      <input
+                        type="text"
+                        value={invoiceNumberInput}
+                        onChange={handleInvoiceNumberChange}
+                        className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none text-gray-900"
+                        placeholder=""
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium text-gray-900 block mb-1">Amount</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={invoiceAmountInput}
+                        onChange={handleInvoiceAmountChange}
+                        className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-100 outline-none text-gray-900"
+                        placeholder=""
+                      />
+                    </div>
+                  </div>
                 </div>
               ) : (
               <div className="space-y-1">

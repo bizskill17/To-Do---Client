@@ -109,10 +109,13 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                 <th className={thClass} onClick={() => requestSort('status')}><div className="flex items-center">Status {getSortIcon('status')}</div></th>
                 <th className={`${thClass} min-w-[120px]`} onClick={() => requestSort('lastUpdateDate')}><div className="flex items-center">Last Updated {getSortIcon('lastUpdateDate')}</div></th>
                 <th className={`${thClass} min-w-[110px]`} onClick={() => requestSort('lastUpdateRemarks')}><div className="flex items-center">Remarks {getSortIcon('lastUpdateRemarks')}</div></th>
-                <th className={`${thClass} min-w-[80px]`} onClick={() => requestSort('billable')}><div className="flex items-center">Billable {getSortIcon('billable')}</div></th>
-                <th className={`${thClass} min-w-[100px]`} onClick={() => requestSort('billingStatus')}><div className="flex items-center">Billing Status {getSortIcon('billingStatus')}</div></th>
-                <th className="px-3 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-900 last:border-r-0 text-center min-w-[90px]">Actions</th>
-              </tr>
+	                <th className={`${thClass} min-w-[80px]`} onClick={() => requestSort('billable')}><div className="flex items-center">Billable {getSortIcon('billable')}</div></th>
+	                <th className={`${thClass} min-w-[100px]`} onClick={() => requestSort('billingStatus')}><div className="flex items-center">Billing Status {getSortIcon('billingStatus')}</div></th>
+	                <th className={`${thClass} min-w-[95px]`} onClick={() => requestSort('invoiceDate')}><div className="flex items-center">Inv Date {getSortIcon('invoiceDate')}</div></th>
+	                <th className={`${thClass} min-w-[110px]`} onClick={() => requestSort('invoiceNumber')}><div className="flex items-center">Inv No. {getSortIcon('invoiceNumber')}</div></th>
+	                <th className={`${thClass} min-w-[90px]`} onClick={() => requestSort('invoiceAmount')}><div className="flex items-center">Amount {getSortIcon('invoiceAmount')}</div></th>
+	                <th className="px-3 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-900 last:border-r-0 text-center min-w-[90px]">Actions</th>
+	              </tr>
             </thead>
             <tbody className="divide-y divide-blue-900">
               {tasks.map((task, index) => {
@@ -143,14 +146,17 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                     <td className={`${tdClass} whitespace-nowrap`}>{task.dueDate || '-'}</td>
                     <td className={tdClass}>{task.assignee}</td>
                     <td className={tdClass}><span className={`text-[10px] font-bold uppercase tracking-wider ${getStatusColor(task.status)}`}>{task.status}</span></td>
-                    <td className={`${tdClass} whitespace-nowrap`}>{formatToIndianDateTime(task.lastUpdateDate)}</td>
-                    <td className={tdClass}>{task.lastUpdateRemarks || '-'}</td>
-                    <td className={tdClass}>{task.billable || '-'}</td>
-                    <td className={tdClass}>{task.billingStatus || '-'}</td>
-	                    <td className={tdClass}>
-	                      <div className="flex items-center space-x-2 justify-center">
-	                        <button onClick={() => onUpdateTask(task)} onDoubleClick={(e) => e.stopPropagation()} disabled={isSyncing} className="px-2 py-1 bg-blue-600 rounded text-xs font-medium text-white hover:bg-blue-700">{isBillingView ? 'Billing' : 'Update'}</button>
-	                        {/* Edit and Delete icons restricted based on Screenshot 1: only Admin or task creator */}
+	                    <td className={`${tdClass} whitespace-nowrap`}>{formatToIndianDateTime(task.lastUpdateDate)}</td>
+	                    <td className={tdClass}>{task.lastUpdateRemarks || '-'}</td>
+	                    <td className={tdClass}>{task.billable || '-'}</td>
+	                    <td className={tdClass}>{task.billingStatus || '-'}</td>
+	                    <td className={`${tdClass} whitespace-nowrap`}>{task.invoiceDate || '-'}</td>
+	                    <td className={tdClass}>{task.invoiceNumber || '-'}</td>
+	                    <td className={tdClass}>{String(task.invoiceAmount ?? '').trim() ? task.invoiceAmount : '-'}</td>
+		                    <td className={tdClass}>
+		                      <div className="flex items-center space-x-2 justify-center">
+		                        <button onClick={() => onUpdateTask(task)} onDoubleClick={(e) => e.stopPropagation()} disabled={isSyncing} className="px-2 py-1 bg-blue-600 rounded text-xs font-medium text-white hover:bg-blue-700">{isBillingView ? 'Billing' : 'Update'}</button>
+		                        {/* Edit and Delete icons restricted based on Screenshot 1: only Admin or task creator */}
 	                        {hasModificationRights && (
 	                          <>
 	                            <button onClick={() => onEditTask(task)} onDoubleClick={(e) => e.stopPropagation()} disabled={isSyncing} className="p-1 text-blue-600 hover:text-blue-800"><Edit2 size={16} /></button>
@@ -184,12 +190,15 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Category</span>{task.category || '-'}</div>
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Client</span>{task.clientName || '-'}</div>
                 <div><span className="font-bold block uppercase text-[10px] text-gray-400">Client Mobile</span>{task.clientMobile || '-'}</div>
-                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Due Date</span>{task.dueDate || '-'}</div>
-                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Billable</span>{task.billable || '-'}</div>
-                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Billing Status</span>{task.billingStatus || '-'}</div>
-                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Assignee</span>{task.assignee}</div>
-                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Created By</span>{task.createdBy}</div>
-                <div className="col-span-2"><span className="font-bold block uppercase text-[10px] text-gray-400">Created At</span>{formatToIndianDateTime(task.date)}</div>
+	                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Due Date</span>{task.dueDate || '-'}</div>
+	                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Billable</span>{task.billable || '-'}</div>
+	                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Billing Status</span>{task.billingStatus || '-'}</div>
+	                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Inv Date</span>{task.invoiceDate || '-'}</div>
+	                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Inv No.</span>{task.invoiceNumber || '-'}</div>
+	                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Amount</span>{String(task.invoiceAmount ?? '').trim() ? task.invoiceAmount : '-'}</div>
+	                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Assignee</span>{task.assignee}</div>
+	                <div><span className="font-bold block uppercase text-[10px] text-gray-400">Created By</span>{task.createdBy}</div>
+	                <div className="col-span-2"><span className="font-bold block uppercase text-[10px] text-gray-400">Created At</span>{formatToIndianDateTime(task.date)}</div>
               </div>
 	              <div className="flex justify-end gap-2 border-t pt-3">
 	                {hasModificationRights && (
