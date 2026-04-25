@@ -82,8 +82,8 @@ export const TaskTable: React.FC<TaskTableProps> = ({
     return taskCreator === currentUserName;
   };
 
-  const thClass = "px-3 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-600 last:border-r-0 cursor-pointer hover:bg-blue-800 transition-colors select-none";
-  const tdClass = "px-3 py-3 text-sm text-black border-r border-gray-200 last:border-r-0 align-top";
+  const thClass = "px-3 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-900 last:border-r-0 cursor-pointer hover:bg-blue-800 transition-colors select-none";
+  const tdClass = "px-3 py-3 text-sm text-black border-r border-blue-900 last:border-r-0 align-top";
 
   return (
     <>
@@ -92,7 +92,7 @@ export const TaskTable: React.FC<TaskTableProps> = ({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-blue-700 border-b border-blue-800">
-                <th className="px-2 py-3 w-8 text-center border-r border-blue-600">
+                <th className="px-2 py-3 w-8 text-center border-r border-blue-900">
                   <input type="checkbox" className="rounded border-gray-300 text-blue-600 h-4 w-4" checked={tasks.length > 0 && selectedIds.length === tasks.length} onChange={handleSelectAll} />
                 </th>
                 <th className={`${thClass} min-w-[56px]`} onClick={() => requestSort('id')}><div className="flex items-center">S.No. {getSortIcon('id')}</div></th>
@@ -106,10 +106,10 @@ export const TaskTable: React.FC<TaskTableProps> = ({
                 <th className={thClass} onClick={() => requestSort('status')}><div className="flex items-center">Status {getSortIcon('status')}</div></th>
                 <th className={`${thClass} min-w-[120px]`} onClick={() => requestSort('lastUpdateDate')}><div className="flex items-center">Last Updated {getSortIcon('lastUpdateDate')}</div></th>
                 <th className={`${thClass} min-w-[110px]`} onClick={() => requestSort('lastUpdateRemarks')}><div className="flex items-center">Remarks {getSortIcon('lastUpdateRemarks')}</div></th>
-                <th className="px-3 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-600 last:border-r-0 text-center min-w-[90px]">Actions</th>
+                <th className="px-3 py-3 text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-900 last:border-r-0 text-center min-w-[90px]">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-blue-900">
               {tasks.map((task, index) => {
 	                const isSyncing = syncingIds.has(task.id);
 	                const hasModificationRights = canModifyTask(task);

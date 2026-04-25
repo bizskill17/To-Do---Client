@@ -626,7 +626,7 @@ export default function App() {
 	              </div>
 	            </div>
 	          ) : (
-	              activeTab === 'dashboard' ? <Dashboard isAdmin={isAdmin} tasks={visibleTasks} users={users} clients={clients} actionLogs={actionLogs} recurringActions={recurringActions} onNavigate={setActiveTab} onFilterChange={handleDashboardFilter} onOpenNewTask={() => setIsTaskModalOpen(true)} onOpenAddUser={() => setIsUserModalOpen(true)} /> :
+	              activeTab === 'dashboard' ? <Dashboard isAdmin={isAdmin} tasks={visibleTasks} users={users} clients={clients} actionLogs={actionLogs} recurringActions={recurringActions} onNavigate={setActiveTab} onFilterChange={handleDashboardFilter} onOpenNewTask={() => setIsTaskModalOpen(true)} onOpenAddUser={() => setIsUserModalOpen(true)} onOpenAddClient={() => setIsAddClientModalOpen(true)} /> :
 	              activeTab === 'all-tasks' ? <TasksView title="All Tasks" description="View and manage all tasks" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="all" hideCreationInfo={true} /> :
 	              activeTab === 'kanban' ? <KanbanView tasks={visibleTasks} onUpdateTask={handleUpdateTaskOptimistic} onEditTask={(t) => { setSelectedTaskForEdit(t); setIsEditTaskModalOpen(true); }} onOpenUpdateModal={(t) => { setSelectedTaskForUpdate(t); setIsUpdateTaskModalOpen(true); }} /> :
 	              activeTab === 'bulk-add' ? <BulkAddTaskView users={users} onBulkAdd={handleBulkAddTask} onCancel={() => setActiveTab('all-tasks')} /> :

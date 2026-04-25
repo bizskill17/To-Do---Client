@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Plus, UserPlus, CheckSquare, Clock, AlertTriangle, CheckCircle, Users, LayoutList, History, ClipboardCheck } from 'lucide-react'; 
+import { Plus, UserPlus, CheckSquare, Clock, AlertTriangle, CheckCircle, Users, LayoutList, History, ClipboardCheck, Building2 } from 'lucide-react'; 
 import { StatCard } from './StatCard';
 import { QuickAction } from './QuickAction';
 import { PendingTable } from './PendingTable';
@@ -10,6 +10,7 @@ interface DashboardProps {
   isAdmin: boolean;
   onOpenNewTask: () => void;
   onOpenAddUser: () => void;
+  onOpenAddClient: () => void;
   onFilterChange: (type: string, value: string) => void;
   onNavigate: (tab: string) => void;
   tasks: Task[];
@@ -23,6 +24,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   isAdmin,
   onOpenNewTask, 
   onOpenAddUser,
+  onOpenAddClient,
   onFilterChange,
   onNavigate,
   tasks, 
@@ -129,6 +131,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <QuickAction label="New Task" icon={<Plus size={18} />} colorClass="bg-blue-600 hover:bg-blue-700 text-white" onClick={onOpenNewTask} />
             <QuickAction label="Add User" icon={<UserPlus size={18} />} colorClass="bg-indigo-500 hover:bg-indigo-600 text-white" onClick={onOpenAddUser} />
+            <QuickAction label="Add Client" icon={<Building2 size={18} />} colorClass="bg-cyan-600 hover:bg-cyan-700 text-white" onClick={onOpenAddClient} />
           </div>
         </div>
       )}
