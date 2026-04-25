@@ -553,6 +553,24 @@ export default function App() {
     }
   };
 
+  const clearTaskFilters = useCallback(() => {
+    setFilterStatus('All Status');
+    setFilterPriority('All Priorities');
+    setFilterClient('All Clients');
+    setFilterOwner('All Partners');
+    setFilterAssignee('All Leaders');
+    setDateFrom('');
+    setDateTo('');
+    setLastUpdateFrom('');
+    setLastUpdateTo('');
+    setSearchTerm('');
+  }, []);
+
+  const handleTabChange = useCallback((tab: string) => {
+    clearTaskFilters();
+    setActiveTab(tab);
+  }, [clearTaskFilters]);
+
   const commonTaskProps = useMemo(() => ({
     users, categories, clients, firms, syncingIds, currentUser, taskTemplates,
     filterStatus, setFilterStatus, filterPriority, setFilterPriority, 
@@ -603,9 +621,9 @@ export default function App() {
   return (
     <div className={`flex h-screen bg-gray-50 overflow-x-hidden overflow-y-hidden flex-col origin-top-left md:[zoom:0.8] md:h-[125vh] ${layoutMode === 'side' ? 'md:flex-row' : 'md:flex-col'}`}>
       {layoutMode === 'side' ? (
-        <Sidebar items={filteredNavItems} activeTab={activeTab} onTabChange={setActiveTab} onLayoutChange={setLayoutMode} layoutMode={layoutMode} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} lastSynced={lastSynced} isSyncing={isSyncing} onSync={() => fetchData()} onLogout={() => { setCurrentUser(null); localStorage.removeItem('taskpro_user'); }} onExitWorkspace={() => { setCurrentUser(null); localStorage.clear(); }} workspaceId={workspaceId} />
+        <Sidebar items={filteredNavItems} activeTab={activeTab} onTabChange={handleTabChange} onLayoutChange={setLayoutMode} layoutMode={layoutMode} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} lastSynced={lastSynced} isSyncing={isSyncing} onSync={() => fetchData()} onLogout={() => { setCurrentUser(null); localStorage.removeItem('taskpro_user'); }} onExitWorkspace={() => { setCurrentUser(null); localStorage.clear(); }} workspaceId={workspaceId} />
       ) : (
-        <TopBar items={filteredNavItems} activeTab={activeTab} onTabChange={setActiveTab} onLayoutChange={setLayoutMode} layoutMode={layoutMode} lastSynced={lastSynced} isSyncing={isSyncing} onSync={() => fetchData()} />
+        <TopBar items={filteredNavItems} activeTab={activeTab} onTabChange={handleTabChange} onLayoutChange={setLayoutMode} layoutMode={layoutMode} lastSynced={lastSynced} isSyncing={isSyncing} onSync={() => fetchData()} />
       )}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         {layoutMode === 'side' && (
@@ -626,7 +644,7 @@ export default function App() {
 	              </div>
 	            </div>
 	          ) : (
-	              activeTab === 'dashboard' ? <Dashboard isAdmin={isAdmin} tasks={visibleTasks} users={users} clients={clients} actionLogs={actionLogs} recurringActions={recurringActions} onNavigate={setActiveTab} onFilterChange={handleDashboardFilter} onOpenNewTask={() => setIsTaskModalOpen(true)} onOpenAddUser={() => setIsUserModalOpen(true)} onOpenAddClient={() => setIsAddClientModalOpen(true)} /> :
+	              activeTab === 'dashboard' ? <Dashboard isAdmin={isAdmin} tasks={visibleTasks} users={users} clients={clients} actionLogs={actionLogs} recurringActions={recurringActions} onNavigate={handleTabChange} onFilterChange={handleDashboardFilter} onOpenNewTask={() => setIsTaskModalOpen(true)} onOpenAddUser={() => setIsUserModalOpen(true)} onOpenAddClient={() => setIsAddClientModalOpen(true)} /> :
 	              activeTab === 'all-tasks' ? <TasksView title="All Tasks" description="View and manage all tasks" tasks={visibleTasks} actionLogs={actionLogs} {...commonTaskProps} filterType="all" hideCreationInfo={true} /> :
 	              activeTab === 'kanban' ? <KanbanView tasks={visibleTasks} onUpdateTask={handleUpdateTaskOptimistic} onEditTask={(t) => { setSelectedTaskForEdit(t); setIsEditTaskModalOpen(true); }} onOpenUpdateModal={(t) => { setSelectedTaskForUpdate(t); setIsUpdateTaskModalOpen(true); }} /> :
 	              activeTab === 'bulk-add' ? <BulkAddTaskView users={users} onBulkAdd={handleBulkAddTask} onCancel={() => setActiveTab('all-tasks')} /> :
