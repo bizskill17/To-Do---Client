@@ -119,14 +119,17 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ tasks, onUpdateTask, onE
                     
                     {/* Content Area */}
                     <div className="flex-1 p-2 flex flex-col justify-center" onClick={() => onOpenUpdateModal(task)}>
-                      <h4 className={`text-[11px] font-bold text-gray-900 leading-tight ${task.status === 'Completed' ? 'line-through opacity-40' : ''}`}>
+                      <div className={`text-[11px] font-bold text-gray-900 leading-tight ${task.status === 'Completed' ? 'line-through opacity-40' : ''}`}>
                         {task.title}
-                        {task.lastUpdateRemarks && (
-                          <span className="text-[10px] font-medium text-blue-500 block mt-1 italic leading-tight">
-                            ({task.lastUpdateRemarks})
-                          </span>
-                        )}
-                      </h4>
+                      </div>
+                      <div className="text-[10px] font-semibold text-indigo-600 mt-1 leading-tight">
+                        {task.clientName || '-'}
+                      </div>
+                      {task.lastUpdateRemarks && (
+                        <div className="text-[10px] font-medium text-blue-500 mt-1 italic leading-tight break-words">
+                          {task.lastUpdateRemarks}
+                        </div>
+                      )}
                     </div>
 
 	                  </div>
